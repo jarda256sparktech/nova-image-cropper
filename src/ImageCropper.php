@@ -1,6 +1,6 @@
 <?php
 
-namespace R64\NovaImageCropper;
+namespace jarda256sparktech\NovaImageCropper;
 
 use Laravel\Nova\Fields\Image;
 use Illuminate\Support\Facades\Storage;

@@ -1,5 +1,5 @@
 {
-    "name": "r64/nova-image-cropper",
+    "name": "jarda256sparktech/nova-image-cropper",
     "description": "A Laravel Nova field.",
     "keywords": [
         "laravel",
@@ -11,13 +11,13 @@
     },
     "autoload": {
         "psr-4": {
-            "R64\\NovaImageCropper\\": "src/"
+            "jarda256sparktech\\NovaImageCropper\\": "src/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "R64\\NovaImageCropper\\FieldServiceProvider"
+                "jarda256sparktech\\NovaImageCropper\\FieldServiceProvider"
             ]
         }
     },
