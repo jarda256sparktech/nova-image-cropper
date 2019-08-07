@@ -72,6 +72,7 @@ export default {
         checkCrossOrigin: false,
         movable: false,
         rotatable: false,
+        zoomable: false,
         minContainerWidth: self.width,
         minContainerHeight: self.height
       })
