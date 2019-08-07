@@ -66,10 +66,12 @@ export default {
 
       this.cropper = new Cropper(this.$refs.img, {
         viewMode: 1,
-        dragMode: 'crop',
+        dragMode: 'none',
         autoCropArea: 1,
         aspectRatio: self.ratio,
         checkCrossOrigin: false,
+        movable: false,
+        rotatable: false,
         minContainerWidth: self.width,
         minContainerHeight: self.height
       })
