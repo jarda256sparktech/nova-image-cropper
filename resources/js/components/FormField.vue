@@ -9,7 +9,7 @@
             v-model="value"
             :is-avatar="field.isAvatar"
             :aspect-ratio="field.aspectRatio"
-            @finished="editingImage = false"
+            @finished="confirmRemoval"
             @fileChanged="setFile"
           />
           <template v-if="!editingImage && value">
