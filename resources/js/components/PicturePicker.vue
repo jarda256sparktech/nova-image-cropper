@@ -40,6 +40,8 @@
         class="picker-file"
         @change="setImage"
       />
+      <PicturePreview
+      />
     </div>
     <br>
   </div>
@@ -48,11 +50,12 @@
 import { resizeImage } from '../utils/image'
 import PicturePickerFile from './PicturePickerFile'
 import PictureCropper from './PictureCropper'
+import PicturePreview from "./PicturePreview";
 
 export default {
   name: 'PicturePicker',
 
-  components: { PicturePickerFile, PictureCropper },
+  components: {PicturePreview, PicturePickerFile, PictureCropper },
 
   props: ['value', 'isAvatar', 'aspectRatio'],
 

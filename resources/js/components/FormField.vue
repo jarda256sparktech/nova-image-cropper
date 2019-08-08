@@ -130,7 +130,7 @@ export default {
      * Confirm removal of the linked file
      */
     confirmRemoval() {
-      this.editingImage = false
+      // this.editingImage = false
       this.removeModalOpen = true
     },
 
@@ -139,7 +139,7 @@ export default {
      */
     closeRemoveModal() {
       this.removeModalOpen = false
-      this.editingImage = true
+      // this.editingImage = true
     },
 
     /**
