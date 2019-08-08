@@ -3,8 +3,9 @@
 		<div class="width50">
 			<img :src="image">
 		</div>
-		<div class="width50" id="cropped-preview">
-        </div>
+		<div class="width50">
+			<div id="cropped-preview"></div>
+		</div>
 	</div>
 </template>
 <script>
@@ -27,5 +28,12 @@
 <style scoped>
 	.width50 {
 		width: 50%;
+		box-sizing: border-box;
+		padding: 15px;
+		background-color: #808080;
+	}
+
+	#cropped-preview {
+		overflow: hidden;
 	}
 </style>
