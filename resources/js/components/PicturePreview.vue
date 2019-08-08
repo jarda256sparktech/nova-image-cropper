@@ -1,7 +1,9 @@
 <template>
 	<div class="el-row--flex">
 		<div class="width50">
-			<img :src="image">
+			<div class="full-preview-wrapper">
+				<img :src="image">
+			</div>
 		</div>
 		<div class="width50">
 			<div id="cropped-preview"></div>
@@ -35,7 +37,9 @@
 		align-items: center;
 		justify-content: center;
 	}
-
+	.full-preview-wrapper{
+		max-height: 300px;
+	}
 	#cropped-preview {
 		overflow: hidden;
 		max-width: 300px;
