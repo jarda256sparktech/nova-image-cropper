@@ -37,9 +37,11 @@
 		align-items: center;
 		justify-content: center;
 	}
-	.full-preview-wrapper{
+
+	.full-preview-wrapper {
 		max-height: 300px;
 	}
+
 	#cropped-preview {
 		overflow: hidden;
 		max-width: 300px;

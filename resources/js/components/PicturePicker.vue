@@ -9,6 +9,15 @@
 				style="font-size: 1.2em; padding: 10px 0;"
 				@change="setImage"
 		>
+		<input
+				:id="hashOrig"
+				class="inputfile"
+				type="file"
+				name="image-original"
+				accept="image/*"
+				style="font-size: 1.2em; padding: 10px 0;"
+				@change="setImageOriginal"
+		>
 		<div
 				class="bg-30 flex flex-wrap px-8 py-4"
 				v-if="imgSrc"
@@ -69,6 +78,9 @@
 				hash: Math.random()
 					.toString(36)
 					.substring(7),
+				hashOrig: Math.random()
+					.toString(36)
+					.substring(7),
 				imgSrc: '',
 				maxWidth: 584,
 				cropImg: '',
@@ -111,6 +123,47 @@
 			},
 
 			setImage(e) {
+				console.log('img',e);
+				let file
+
+				if (e.raw) {
+					file = e.raw
+				} else {
+					file = e.target.files[0]
+				}
+
+				if (!file.type.includes('image/')) {
+					alert('Please select an image file')
+					return
+				}
+
+				this.originalName = file.name
+				this.originalFileType = file.type
+
+				if (typeof FileReader === 'function') {
+					const reader = new FileReader()
+
+					reader.onload = event => {
+						resizeImage(
+							event.target.result,
+							file.type,
+							({dataUrl, width, height, file}) => {
+								this.updateCropper(dataUrl)
+								this.$emit('input', dataUrl)
+								this.$emit('setWidth', width)
+								this.$emit('setHeight', height)
+								this.$emit('fileChanged', file)
+							}
+						)
+					}
+
+					reader.readAsDataURL(file)
+				} else {
+					alert('Sorry, FileReader API not supported')
+				}
+			},
+
+			setImageOriginal(e) {
 				let file
 
 				if (e.raw) {
