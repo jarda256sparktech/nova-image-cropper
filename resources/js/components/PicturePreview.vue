@@ -1,30 +1,32 @@
 <template>
-  <div>
-    Test
-  </div>
+	<div class="el-row--flex">
+		<div class="width50">
+			<img :src="image">
+		</div>
+		<div class="width50">
+			<img :src="image">
+        </div>
+	</div>
 </template>
 <script>
-import { resizeImage } from '../utils/image'
-import PicturePickerFile from './PicturePickerFile'
-import PictureCropper from './PictureCropper'
 
-export default {
-  name: 'PicturePreview',
-  props: [],
+	export default {
+		name: 'PicturePreview',
+		props: ['image'],
 
-  data() {
-    return {
-    }
-  },
+		data() {
+			return {}
+		},
 
-  computed: {
-  },
+		computed: {},
 
-  watch: {
-  },
+		watch: {},
 
-  methods: {}
-}
+		methods: {}
+	}
 </script>
 <style scoped>
+	.width50 {
+		width: 50%;
+	}
 </style>
