@@ -64,6 +64,11 @@ export default {
       this.setWidth()
       const self = this
 
+      this.$refs.img.addEventListener('cropmove', (event) => {
+        console.log(event.detail);
+        console.log(event.detail.originalEvent);
+        console.log(event.detail.action);
+      });
       this.cropper = new Cropper(this.$refs.img, {
         viewMode: 1,
         dragMode: 'none',
@@ -78,11 +83,6 @@ export default {
         preview: '#cropped-preview'
       })
       this.cropper.replace(this.image)
-      this.cropper.addEventListener('cropmove', (event) => {
-        console.log(event.detail);
-        console.log(event.detail.originalEvent);
-        console.log(event.detail.action);
-      });
     },
 
     setWidth() {
