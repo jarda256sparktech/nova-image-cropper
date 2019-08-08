@@ -39,6 +39,10 @@
 	#cropped-preview {
 		overflow: hidden;
 		max-width: 300px;
+		min-width: 300px;
+		width: 300px;
 		max-height: 200px;
+		min-height: 200px;
+		height: 200px;
 	}
 </style>
