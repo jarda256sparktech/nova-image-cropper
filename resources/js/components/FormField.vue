@@ -1,209 +1,186 @@
 <template>
-  <default-field :field="field">
-    <template slot="field">
-      <loading-view :loading="deleting">
-        <div class="picker-wrapper">
-          <PicturePicker
-            ref="picturePicker"
-            v-show="editingImage || !value"
-            v-model="value"
-            :is-avatar="field.isAvatar"
-            :aspect-ratio="field.aspectRatio"
-            @finished="confirmRemoval"
-            @fileChanged="setFile"
-            @thumbFileChanged="setThumbFile"
-          />
-          <template v-if="!editingImage && value">
-            <div class="bg-30 flex px-8 py-4">
-              <a
-                class="btn btn-default btn-primary cursor-pointer"
-                @click="editingImage = true"
-              >{{__('Edit Image')}}</a>
-              <a
-                class="btn btn-default btn-danger cursor-pointer ml-3"
-                v-if="shouldShowRemoveButton"
-                @click="confirmRemoval"
-              >{{__('Delete')}}</a>
-            </div>
-            <img
-              :src="value"
-              :class="{ avatar: field.isAvatar }"
-            >
-          </template>
+    <default-field :field="field">
+        <template slot="field">
+            <loading-view :loading="deleting">
+                <div class="picker-wrapper">
+                    <PicturePicker
+                        :aspect-ratio="field.aspectRatio"
+                        @deleteImage="confirmRemoval"
+                        @fileChanged="setFile"
+                        @thumbFileChanged="setThumbFile"
+                        ref="picturePicker"
+                        v-model="value"
+                        v-show="editingImage || !value"
+                    />
+                    <p
+                        class="my-2 text-danger"
+                        v-if="hasError"
+                    >{{ firstError }}</p>
 
-          <p
-            v-if="hasError"
-            class="my-2 text-danger"
-          >{{ firstError }}</p>
-
-          <portal to="modals">
-            <transition name="fade">
-              <confirm-upload-removal-modal
-                v-if="removeModalOpen"
-                @confirm="removeFile"
-                @close="closeRemoveModal"
-              />
-            </transition>
-          </portal>
-        </div>
-      </loading-view>
-    </template>
-  </default-field>
+                    <portal to="modals">
+                        <transition name="fade">
+                            <confirm-upload-removal-modal
+                                @close="closeRemoveModal"
+                                @confirm="removeFile"
+                                v-if="removeModalOpen"
+                            />
+                        </transition>
+                    </portal>
+                </div>
+            </loading-view>
+        </template>
+    </default-field>
 </template>
 
 <script>
-import { FormField, HandlesValidationErrors, Errors } from 'laravel-nova'
-import { UrlToBase64 } from '../utils/image'
-import PicturePicker from './PicturePicker'
+	import {Errors, FormField, HandlesValidationErrors} from 'laravel-nova'
+	import PicturePicker from './PicturePicker'
 
-require('element-ui/lib/theme-chalk/index.css')
+	require('element-ui/lib/theme-chalk/index.css');
 
-export default {
-  components: { PicturePicker },
+	export default {
+		components: {PicturePicker},
 
-  mixins: [FormField, HandlesValidationErrors],
+		mixins: [FormField, HandlesValidationErrors],
 
-  props: ['resourceName', 'resourceId', 'field'],
+		props: ['resourceName', 'resourceId', 'field'],
 
-  data() {
-    return {
-      deleting: false,
-      editingImage: false,
-      file: null,
-      origFile: null,
-      fileName: '',
-      removeModalOpen: false,
-      uploadErrors: new Errors()
-    }
-  },
+		data() {
+			return {
+				deleting: false,
+				editingImage: false,
+				thumbFile: null,
+				file: null,
+				origFile: null,
+				fileName: '',
+				removeModalOpen: false,
+				uploadErrors: new Errors()
+			}
+		},
 
-  computed: {
-    /**
-     * Determine whether the field should show the remove button
-     */
-    shouldShowRemoveButton() {
-      return Boolean(this.field.deletable)
-    },
+		computed: {
+			/**
+			 * Determine whether the field should show the remove button
+			 */
+			shouldShowRemoveButton() {
+				return Boolean(this.field.deletable)
+			},
 
-    /**
-     * Determine if should hit the endpoint for delete
-     */
-    imageExistsOnServer() {
-      return Boolean(this.field.previewUrl)
-    }
-  },
+			/**
+			 * Determine if should hit the endpoint for delete
+			 */
+			imageExistsOnServer() {
+				return Boolean(this.field.previewUrl)
+			}
+		},
 
-  mounted() {
-    this.value = this.field.previewUrl
-    this.field.fill = formData => {
-      if (this.file) {
-        formData.append(this.field.attribute, this.file, this.fileName)
-      }
-    }
-  },
+		mounted() {
+			this.value = this.field.previewUrl;
+			this.field.fill = formData => {
+				if (this.file) {
+					formData.append(this.field.attribute, this.file, this.fileName)
+				}
+			}
+		},
 
-  methods: {
-    /*
-     * Set the initial, internal value for the field.
-     */
-    setInitialValue() {
-      this.value = this.field.value || ''
-    },
+		methods: {
+			/*
+             * Set the initial, internal value for the field.
+             */
+			setInitialValue() {
+				this.value = this.field.value || ''
+			},
 
-    /*
-     * Set the file generated by the cropper.
-     */
-    setFile(file) {
-      this.editingImage = true
-      console.log('file',file);
-      this.file = file
-      this.fileName = file.name
-    },
-    setThumbFile(file) {
-      this.thumbFile = file
-    },
+			/*
+             * Set the file generated by the cropper.
+             */
+			setFile(file) {
+				this.editingImage = true;
+				// console.log('setFile');
+				this.file = file;
+				this.fileName = file.name
+			},
+			setThumbFile(file) {
+				// console.log('setThumbFile');
+				this.thumbFile = file
+			},
 
-    /*
-     * Reset the file state.
-     */
-    resetFile(file) {
-      this.file = null
-      this.fileName = ''
-      this.value = ''
-    },
+			/*
+             * Reset the file state.
+             */
+			resetFile(file) {
+				this.file = null;
+				this.thumbFile = null;
+				this.fileName = '';
+				this.value = ''
+			},
 
-    /**
-     * Confirm removal of the linked file
-     */
-    confirmRemoval() {
-      // this.editingImage = false
-      this.removeModalOpen = true
-    },
+			/**
+			 * Confirm removal of the linked file
+			 */
+			confirmRemoval() {
+				// this.editingImage = false
+				this.removeModalOpen = true
+			},
 
-    /**
-     * Close the upload removal modal
-     */
-    closeRemoveModal() {
-      this.removeModalOpen = false
-      // this.editingImage = true
-    },
+			/**
+			 * Close the upload removal modal
+			 */
+			closeRemoveModal() {
+				this.removeModalOpen = false
+				// this.editingImage = true
+			},
 
-    /**
-     * Remove the linked file from storage
-     */
-    async removeFile() {
-      this.closeRemoveModal()
+			/**
+			 * Remove the linked file from storage
+			 */
+			async removeFile() {
+				this.closeRemoveModal();
 
-      if (!this.imageExistsOnServer) {
-        this.resetFile()
-        return
-      }
+				if (!this.imageExistsOnServer) {
+					this.resetFile();
+					return
+				}
 
-      this.deleting = true
-      this.uploadErrors = new Errors()
+				this.deleting = true;
+				this.uploadErrors = new Errors();
 
-      const {
-        resourceName,
-        resourceId,
-        relatedResourceName,
-        relatedResourceId,
-        viaRelationship
-      } = this
-      const attribute = this.field.attribute
+				const {
+					resourceName,
+					resourceId,
+					relatedResourceName,
+					relatedResourceId,
+					viaRelationship
+				} = this;
+				const attribute = this.field.attribute;
 
-      const uri = this.viaRelationship
-        ? `/nova-api/${resourceName}/${resourceId}/${relatedResourceName}/${relatedResourceId}/field/${attribute}?viaRelationship=${viaRelationship}`
-        : `/nova-api/${resourceName}/${resourceId}/field/${attribute}`
+				const uri = this.viaRelationship
+					? `/nova-api/${resourceName}/${resourceId}/${relatedResourceName}/${relatedResourceId}/field/${attribute}?viaRelationship=${viaRelationship}`
+					: `/nova-api/${resourceName}/${resourceId}/field/${attribute}`;
 
-      try {
-        await Nova.request().delete(uri)
-        this.deleting = false
-        this.resetFile()
-        this.$emit('file-deleted')
-      } catch (error) {
-        this.deleting = false
+				try {
+					await Nova.request().delete(uri);
+					this.deleting = false;
+					this.resetFile();
+					this.$emit('file-deleted')
+				} catch (error) {
+					this.deleting = false;
 
-        if (error.response.status == 422) {
-          this.uploadErrors = new Errors(error.response.data.errors)
-        }
-      }
-    },
+					if (error.response.status == 422) {
+						this.uploadErrors = new Errors(error.response.data.errors)
+					}
+				}
+			},
 
-    /**
-     * Update the field's internal value.
-     */
-    handleChange(value) {
-      this.value = value
-    }
-  }
-}
+			/**
+			 * Update the field's internal value.
+			 */
+			handleChange(value) {
+				// console.log('handleChange');
+				this.value = value
+			}
+		}
+	}
 </script>
 <style scoped>
-.avatar {
-  object-fit: cover;
-  width: 318px;
-  height: 318px;
-  border-radius: 9999px;
-  margin: 20px 0;
-}
 </style>

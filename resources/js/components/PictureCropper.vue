@@ -1,14 +1,14 @@
 <template>
-	<div
-			ref="container"
-			class="container"
-	>
-		<img
-				ref="img"
-				:src="image"
-				alt="Picture"
-		>
-	</div>
+    <div
+        class="container"
+        ref="container"
+    >
+        <img
+            :src="image"
+            alt="Picture"
+            ref="img"
+        >
+    </div>
 </template>
 <script>
 	import Cropper from 'cropperjs'
@@ -26,6 +26,14 @@
 			ratio: {
 				type: Number,
 				default: 1
+			},
+			originalFileType: {
+				type: String,
+				default: ''
+			},
+			originalName: {
+				type: String,
+				default: ''
 			}
 		},
 
@@ -46,30 +54,26 @@
 		},
 
 		mounted() {
-			window.addEventListener('resize', this.setWidth)
+			window.addEventListener('resize', this.setWidth);
 			this.buildCropper()
 		},
 
 		destroyed() {
-			window.removeEventListener('resize', this.setWidth)
+			window.removeEventListener('resize', this.setWidth);
 			this.cropper.destroy()
+			// this.$refs.img.removeEventListener('cropmove', this.updateThumb);
 		},
 
 		methods: {
 			buildCropper() {
 				if (this.cropper) {
-					this.cropper.destroy()
+					this.cropper.destroy();
 				}
 
-				this.setWidth()
-				const self = this
+				this.setWidth();
+				const self = this;
 
-				this.$refs.img.addEventListener('cropmove', (event) => {
-					this.updateThumb()
-				});
-				this.$refs.img.addEventListener('cropstart', (event) => {
-					this.updateThumb()
-				});
+				this.$refs.img.addEventListener('cropmove', this.updateThumb);
 
 				this.cropper = new Cropper(this.$refs.img, {
 					viewMode: 1,
@@ -83,26 +87,35 @@
 					minContainerWidth: self.width,
 					minContainerHeight: self.height,
 					preview: '#cropped-preview'
-				})
+				});
 				this.cropper.replace(this.image)
 			},
 
 			updateThumb() {
 				const canvas = this.getCroppedCanvas();
 				if (canvas) {
-				    const thumbFile = canvas.toDataURL();
-				    console.log('thumbFile',thumbFile);
-					this.$emit('thumbFileChanged', thumbFile)
+					// console.log('updateThumb');
+					const thumbFileSrc = canvas.toDataURL();
+					this.$emit('setThumbImageSrc', thumbFileSrc);
+					canvas.toBlob(blob => {
+						const {type} = blob;
+						const file = new File([blob], this.originalName, {
+							type,
+							lastModified: Date.now()
+						});
+						// console.log(file,thumbFileSrc);
+						this.$emit('thumbFileChanged', file);
+					}, this.originalFileType);
 				}
 			},
 
 
 			setWidth() {
-				const width = this.$refs.container.clientWidth
+				const width = this.$refs.container.clientWidth;
 				if (!width) {
 					return
 				}
-				this.width = width
+				this.width = width;
 				this.height = this.ratio ? this.width / this.ratio : this.height
 			},
 
@@ -114,21 +127,22 @@
 			},
 
 			replace(image) {
-				this.image = image
+				this.image = image;
 
-				this.buildCropper()
+				this.buildCropper();
+				this.$emit('thumbFileChanged', image)
 			}
 		}
 	}
 </script>
 <style scoped>
-	.container {
-		max-width: 640px;
-		margin: 20px auto;
-	}
+    .container {
+        max-width: 640px;
+        margin: 20px auto;
+    }
 
-	img {
-		width: 100%;
-		max-width: 100%;
-	}
+    img {
+        width: 100%;
+        max-width: 100%;
+    }
 </style>
