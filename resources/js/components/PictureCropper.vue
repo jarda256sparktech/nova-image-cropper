@@ -74,7 +74,8 @@ export default {
         rotatable: false,
         zoomable: false,
         minContainerWidth: self.width,
-        minContainerHeight: self.height
+        minContainerHeight: self.height,
+        preview: '#cropped-preview'
       })
       this.cropper.replace(this.image)
     },

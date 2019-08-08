@@ -4,7 +4,7 @@
 			<img :src="image">
 		</div>
 		<div class="width50">
-			<img :src="image">
+			<img id="cropped-preview">
         </div>
 	</div>
 </template>
