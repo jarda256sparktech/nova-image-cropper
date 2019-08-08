@@ -78,6 +78,11 @@ export default {
         preview: '#cropped-preview'
       })
       this.cropper.replace(this.image)
+      this.cropper.addEventListener('cropmove', (event) => {
+        console.log(event.detail);
+        console.log(event.detail.originalEvent);
+        console.log(event.detail.action);
+      });
     },
 
     setWidth() {

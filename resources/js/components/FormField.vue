@@ -11,6 +11,7 @@
             :aspect-ratio="field.aspectRatio"
             @finished="confirmRemoval"
             @fileChanged="setFile"
+            @thumbFileChanged="setThumbFile"
           />
           <template v-if="!editingImage && value">
             <div class="bg-30 flex px-8 py-4">
@@ -69,6 +70,7 @@ export default {
       deleting: false,
       editingImage: false,
       file: null,
+      origFile: null,
       fileName: '',
       removeModalOpen: false,
       uploadErrors: new Errors()
@@ -113,8 +115,12 @@ export default {
      */
     setFile(file) {
       this.editingImage = true
+      console.log('file',file);
       this.file = file
       this.fileName = file.name
+    },
+    setThumbFile(file) {
+      this.thumbFile = file
     },
 
     /*
