@@ -3,8 +3,7 @@
 		<div class="width50">
 			<img :src="image">
 		</div>
-		<div class="width50">
-			<div id="cropped-preview"></div>
+		<div class="width50" id="cropped-preview">
 		</div>
 	</div>
 </template>
