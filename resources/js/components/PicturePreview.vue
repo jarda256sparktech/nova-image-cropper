@@ -31,9 +31,14 @@
 		box-sizing: border-box;
 		padding: 15px;
 		background-color: #808080;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 
 	#cropped-preview {
 		overflow: hidden;
+		max-width: 300px;
+		max-height: 200px;
 	}
 </style>
