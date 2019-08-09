@@ -2,7 +2,7 @@
     <div class="el-row--flex">
         <div class="width50">
             <div class="full-preview-wrapper">
-                <img :src="image">
+                <img :src="parsedValueObject.binaryImg">
             </div>
         </div>
         <div class="width50">
@@ -14,7 +14,7 @@
 
 	export default {
 		name: 'PicturePreview',
-		props: ['image', 'cropImage'],
+		props: ['parsedValueObject'],
 
 		data() {
 			return {}

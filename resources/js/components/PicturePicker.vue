@@ -23,28 +23,25 @@
         </div>
         <br>
         <div class="cropper-wrapper">
-            <PictureCropper
-                :image="imgSrc"
-                :ratio="ratio"
-                :value-object="valueObject"
-                @update-value-object="passUpdateValueObject"
-                :originalFileType="originalFileType"
-                :originalName="originalName"
-                @setCropImageSrc="setCropImage"
-                ref="cropper"
-                v-show="imgSrc"
-            />
+<!--            <PictureCropper-->
+<!--                :ratio="ratio"-->
+<!--                :parsed-value-object="parsedValueObject"-->
+<!--                @update-value-object="passUpdateValueObject"-->
+<!--                :originalFileType="originalFileType"-->
+<!--                :originalName="originalName"-->
+<!--                ref="cropper"-->
+<!--                v-show="loaded"-->
+<!--            />-->
             <PicturePickerFile
-                @change="setImage"
+                @change="pickImage"
                 class="picker-file"
-                v-if="!imgSrc"
+                v-if="!loaded"
             />
-            <PicturePreview
-                :image="imgSrc"
-                :cropImage="cropImgSrc"
-                ref="preview"
-                v-show="imgSrc"
-            />
+<!--            <PicturePreview-->
+<!--                :parsed-value-object="parsedValueObject"-->
+<!--                ref="preview"-->
+<!--                v-show="loaded"-->
+<!--            />-->
         </div>
         <br>
     </div>
@@ -60,14 +57,11 @@
 
 		components: {PicturePreview, PicturePickerFile, PictureCropper},
 
-		props: ['value', 'valueObject', 'aspectRatio'],
+		props: ['value', 'parsedValueObject', 'aspectRatio','loaded'],
 
 		data() {
 			return {
 				hash: Math.random()
-					.toString(36)
-					.substring(7),
-				hashCrop: Math.random()
 					.toString(36)
 					.substring(7),
 				imgSrc: '',
@@ -93,83 +87,53 @@
 			}
 		},
 
-		watch: {
-			value(value) {
-				// console.log('watchValue', value);
-
-				this.updateCropper(value)
-			}
-		},
-
 		methods: {
-			passUpdateValueObject(valueObject){
-				this.$emit('update-value-object',valueObject);
+			passUpdateValueObject(parsedValueObject){
+				this.$emit('update-value-object',parsedValueObject);
             },
 			updateCropper(image) {
 				console.log('updateCropper');
-				this.imgSrc = image;
-
-
-				this.cropImg = image;
-
 				if (this.$refs.cropper) {
 					this.$refs.cropper.replace(image)
 				}
 			},
 
-			setImage(e) {
-				// console.log('setImage');
-				// console.log('img',e);
+			pickImage(e) {
 				let file;
-
 				if (e.raw) {
 					file = e.raw
 				} else {
 					file = e.target.files[0]
 				}
-
 				if (!file.type.includes('image/')) {
 					alert('Please select an image file');
-					return
+					return;
 				}
-
-				this.originalName = file.name;
-				this.originalFileType = file.type;
-
+				// this.originalName = file.name;
+				// this.originalFileType = file.type;
 				if (typeof FileReader === 'function') {
 					const reader = new FileReader();
-
 					reader.onload = event => {
 						resizeImage(
 							event.target.result,
 							file.type,
-							({dataUrl, width, height, file}) => {
-								// console.log('resize');
+							({dataUrl}) => {
 								if (dataUrl) {
-									this.$emit("update-value-object", {...this.valueObject, modified: true, originalBinary: dataUrl});
-								} else {
-									this.$emit("update-value-object", {});
+									let newValueObject = {...this.parsedValueObject, modified: true, binaryImg:
+                                        dataUrl,loaded:true};
+									delete newValueObject.cropBinary;
+									delete newValueObject.cropBoxData;
+									this.$emit("update-value-object", newValueObject);
+									this.$emit("update-update-loaded", true);
 								}
 								this.updateCropper(dataUrl);
-								this.$emit('input', dataUrl);
-								this.$emit('setWidth', width);
-								this.$emit('setHeight', height);
-								this.$emit('fileChanged', file);
-								this.$emit('cropFileChanged', file);
-								this.cropImgSrc = dataUrl;
 							}
 						)
 					};
-
 					reader.readAsDataURL(file)
 				} else {
 					alert('Sorry, FileReader API not supported')
 				}
-			},
-
-			setCropImage(cropDataUrl) {
-				// console.log('setThumbImage');
-				this.cropImgSrc = cropDataUrl;
 			},
 		}
 	}

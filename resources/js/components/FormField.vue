@@ -5,11 +5,12 @@
                 <div class="picker-wrapper">
                     <PicturePicker
                         :aspect-ratio="field.aspectRatio"
-                        :value-object="valueObject"
+                        :parsed-value-object="parsedValueObject"
                         @update-value-object="onUpdateValueObject"
+                        :loaded="loaded"
+                        @update-loaded="onUpdateLoaded"
                         @deleteImage="confirmRemoval"
-                        @fileChanged="setFile"
-                        @cropFileChanged="setCropFile"
+                        @resetChanges="confirmReset"
                         ref="picturePicker"
                         v-model="value"
                     />
@@ -25,6 +26,11 @@
                                 @confirm="removeFile"
                                 v-if="removeModalOpen"
                             />
+                            <confirm-upload-removal-modal
+                                @close="closeResetModal"
+                                @confirm="resetChanges"
+                                v-if="resetModalOpen"
+                            />
                         </transition>
                     </portal>
                 </div>
@@ -36,6 +42,7 @@
 <script>
 	import {Errors, FormField, HandlesValidationErrors} from 'laravel-nova'
 	import PicturePicker from './PicturePicker'
+	import {UrlToBase64} from '../utils/image'
 
 	require('element-ui/lib/theme-chalk/index.css');
 
@@ -49,18 +56,13 @@
 		data() {
 			return {
 				isNew: false,
-				valueObject: {},
+				parsedValueObject: {},
 				originalValueObject: {},
 				editingImage: true,
 				resetModalOpen: false,
 				removeModalOpen: false,
+				loaded: false,
 				deleting: false,
-
-
-				cropFile: null,
-				file: null,
-				origFile: null,
-				fileName: '',
 				uploadErrors: new Errors()
 			}
 		},
@@ -71,50 +73,44 @@
 			}
 		},
 		watch: {
-			valueObject(value) {
-				this.value = JSON.stringify(value);
+			parsedValueObject() {
+				let stringObject = JSON.stringify(this.parsedValueObject);
+				console.log('watch val object', stringObject);
+				this.value = stringObject;
 			}
 		},
 
 		beforeMount() {
-			console.log('before mounted FormField');
+			// console.log('before mounted FormField');
 			this.value = this.field.value || '';
-			this.valueObject = JSON.parse(this.field.value) || {};
-			this.valueObject.modified = false;
+			let parsedValueObject = JSON.parse(this.field.value) || {};
+			parsedValueObject.modified = false;
+
 			if (!this.isNew) {
-				let file = new File(this.field.previewUrl);
-				if (typeof FileReader === 'function') {
-					const reader = new FileReader();
-					reader.onload = event => {
-						this.valueObject.binaryImg = event.target.result
-					};
-					reader.readAsDataURL(file)
-				} else {
-					alert('Sorry, FileReader API not supported')
-				}
-				this.originalValueObject = this.valueObject;
+				// let file = new File(this.field.previewUrl);
+				// if (typeof FileReader === 'function') {
+				// 	const reader = new FileReader();
+				// 	reader.onload = event => {
+				// 		this.parsedValueObject.binaryImg = event.target.result
+				// 	};
+				// 	reader.readAsDataURL(file)
+				// } else {
+				// 	alert('Sorry, FileReader API not supported')
+				// }
+				//
+				this.parsedValueObject.binaryImg = UrlToBase64(this.field.previewUrl);
+				this.originalValueObject = parsedValueObject;
 			}
+			this.parsedValueObject = parsedValueObject;
 		},
 
 		methods: {
-			setFile(file) {
-				this.file = file;
-				this.fileName = file.name
-			},
-			setCropFile(file) {
-				// console.log('setThumbFile');
-				this.cropFile = file
-			},
-
-			/*
-             * Reset the file state.
-             */
 			resetFile(file) {
 				this.file = null;
 				this.cropFile = null;
 				this.fileName = '';
 				this.value = '';
-				this.valueObject = {};
+				this.parsedValueObject = {};
 			},
 
 
@@ -156,13 +152,6 @@
 				}
 			},
 
-			// setInitialValue() {
-			// 	console.log('init field value',this.field.value);
-			// 	this.value = this.field.value || '';
-			// 	this.valueObject = JSON.parse(this.field.value) || {};
-			//
-			// },
-
 			/**
 			 * Update the field's internal value.
 			 */
@@ -170,9 +159,12 @@
 				this.value = value
 			},
 
-			onUpdateValueObject(valueObject) {
-				console.log('onUpdateValueObject', valueObject);
-				this.valueObject = valueObject;
+			onUpdateValueObject(newValueObject) {
+				console.log('onUpdateValueObject', newValueObject);
+				this.parsedValueObject = newValueObject;
+			},
+			onUpdateLoaded(value) {
+				this.loaded = value;
 			},
 			confirmRemoval() {
 				this.removeModalOpen = true
@@ -187,12 +179,12 @@
 				this.resetModalOpen = false
 			},
 			resetChanges() {
-				this.valueObject = this.originalValueObject;
+				this.parsedValueObject = this.originalValueObject;
 				this.file = null;
 				this.cropFile = null;
 				this.fileName = '';
 				this.value = '';
-				this.valueObject = {};
+				this.parsedValueObject = {};
 			},
 		}
 	}

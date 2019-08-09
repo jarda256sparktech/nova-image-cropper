@@ -35,7 +35,7 @@
 				type: String,
 				default: ''
 			},
-			valueObject: Object
+			parsedValueObject: Object
 		},
 
 		data() {
@@ -55,7 +55,7 @@
 		},
 
 		mounted() {
-			console.log('mounted picture cropper');
+			// console.log('mounted picture cropper',this.parsedValueObject);
 			window.addEventListener('resize', this.setWidth);
 			this.buildCropper()
 		},
@@ -100,7 +100,7 @@
 					const cropBoxData = this.getCropBoxData();
 					console.log('updateCrop');
 					this.$emit('setCropImageSrc', cropFileSrc);
-					this.$emit("update-value-object", {...this.valueObject,
+					this.$emit("update-value-object", {...this.parsedValueObject,
                         modified: true,cropBinary:cropFileSrc,cropBoxData:cropBoxData});
 					canvas.toBlob(blob => {
 						const {type} = blob;

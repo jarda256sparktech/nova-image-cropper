@@ -31,7 +31,7 @@ export const resizeImage = (image, type, cb) => {
         type,
         lastModified: Date.now()
       });
-      const params = { dataUrl, width, height, file };
+      const params = { dataUrl };
       cb(params);
     });
   };

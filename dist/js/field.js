@@ -1583,7 +1583,7 @@ exports = module.exports = __webpack_require__(0)(false);
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
 
 // exports
 
@@ -1600,6 +1600,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_laravel_nova___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_laravel_nova__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__PicturePicker__ = __webpack_require__(29);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__PicturePicker___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__PicturePicker__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils_image__ = __webpack_require__(33);
 
 
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
@@ -1639,6 +1640,13 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 //
 //
 //
+//
+//
+//
+//
+//
+//
+
 
 
 
@@ -1655,17 +1663,13 @@ __webpack_require__(72);
 	data: function data() {
 		return {
 			isNew: false,
-			valueObject: {},
+			parsedValueObject: {},
 			originalValueObject: {},
 			editingImage: true,
 			resetModalOpen: false,
 			removeModalOpen: false,
+			loaded: false,
 			deleting: false,
-
-			cropFile: null,
-			file: null,
-			origFile: null,
-			fileName: '',
 			uploadErrors: new __WEBPACK_IMPORTED_MODULE_1_laravel_nova__["Errors"]()
 		};
 	},
@@ -1677,54 +1681,45 @@ __webpack_require__(72);
 		}
 	},
 	watch: {
-		valueObject: function valueObject(value) {
-			this.value = JSON.stringify(value);
+		parsedValueObject: function parsedValueObject() {
+			var stringObject = JSON.stringify(this.parsedValueObject);
+			console.log('watch val object', stringObject);
+			this.value = stringObject;
 		}
 	},
 
 	beforeMount: function beforeMount() {
-		var _this = this;
-
-		console.log('before mounted FormField');
+		// console.log('before mounted FormField');
 		this.value = this.field.value || '';
-		this.valueObject = JSON.parse(this.field.value) || {};
-		this.valueObject.modified = false;
+		var parsedValueObject = JSON.parse(this.field.value) || {};
+		parsedValueObject.modified = false;
+
 		if (!this.isNew) {
-			var file = new File(this.field.previewUrl);
-			if (typeof FileReader === 'function') {
-				var reader = new FileReader();
-				reader.onload = function (event) {
-					_this.valueObject.binaryImg = event.target.result;
-				};
-				reader.readAsDataURL(file);
-			} else {
-				alert('Sorry, FileReader API not supported');
-			}
-			this.originalValueObject = this.valueObject;
+			// let file = new File(this.field.previewUrl);
+			// if (typeof FileReader === 'function') {
+			// 	const reader = new FileReader();
+			// 	reader.onload = event => {
+			// 		this.parsedValueObject.binaryImg = event.target.result
+			// 	};
+			// 	reader.readAsDataURL(file)
+			// } else {
+			// 	alert('Sorry, FileReader API not supported')
+			// }
+			//
+			this.parsedValueObject.binaryImg = Object(__WEBPACK_IMPORTED_MODULE_3__utils_image__["a" /* UrlToBase64 */])(this.field.previewUrl);
+			this.originalValueObject = parsedValueObject;
 		}
+		this.parsedValueObject = parsedValueObject;
 	},
 
 
 	methods: {
-		setFile: function setFile(file) {
-			this.file = file;
-			this.fileName = file.name;
-		},
-		setCropFile: function setCropFile(file) {
-			// console.log('setThumbFile');
-			this.cropFile = file;
-		},
-
-
-		/*
-            * Reset the file state.
-            */
 		resetFile: function resetFile(file) {
 			this.file = null;
 			this.cropFile = null;
 			this.fileName = '';
 			this.value = '';
-			this.valueObject = {};
+			this.parsedValueObject = {};
 		},
 		removeFile: function () {
 			var _ref = _asyncToGenerator( /*#__PURE__*/__WEBPACK_IMPORTED_MODULE_0_babel_runtime_regenerator___default.a.mark(function _callee() {
@@ -1788,22 +1783,18 @@ __webpack_require__(72);
 		}(),
 
 
-		// setInitialValue() {
-		// 	console.log('init field value',this.field.value);
-		// 	this.value = this.field.value || '';
-		// 	this.valueObject = JSON.parse(this.field.value) || {};
-		//
-		// },
-
 		/**
    * Update the field's internal value.
    */
 		handleChange: function handleChange(value) {
 			this.value = value;
 		},
-		onUpdateValueObject: function onUpdateValueObject(valueObject) {
-			console.log('onUpdateValueObject', valueObject);
-			this.valueObject = valueObject;
+		onUpdateValueObject: function onUpdateValueObject(newValueObject) {
+			console.log('onUpdateValueObject', newValueObject);
+			this.parsedValueObject = newValueObject;
+		},
+		onUpdateLoaded: function onUpdateLoaded(value) {
+			this.loaded = value;
 		},
 		confirmRemoval: function confirmRemoval() {
 			this.removeModalOpen = true;
@@ -1818,12 +1809,12 @@ __webpack_require__(72);
 			this.resetModalOpen = false;
 		},
 		resetChanges: function resetChanges() {
-			this.valueObject = this.originalValueObject;
+			this.parsedValueObject = this.originalValueObject;
 			this.file = null;
 			this.cropFile = null;
 			this.fileName = '';
 			this.value = '';
-			this.valueObject = {};
+			this.parsedValueObject = {};
 		}
 	}
 });
@@ -12990,9 +12981,6 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 //
 //
 //
-//
-//
-//
 
 
 
@@ -13004,12 +12992,11 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 	components: { PicturePreview: __WEBPACK_IMPORTED_MODULE_3__PicturePreview___default.a, PicturePickerFile: __WEBPACK_IMPORTED_MODULE_1__PicturePickerFile___default.a, PictureCropper: __WEBPACK_IMPORTED_MODULE_2__PictureCropper___default.a },
 
-	props: ['value', 'valueObject', 'aspectRatio'],
+	props: ['value', 'parsedValueObject', 'aspectRatio', 'loaded'],
 
 	data: function data() {
 		return {
 			hash: Math.random().toString(36).substring(7),
-			hashCrop: Math.random().toString(36).substring(7),
 			imgSrc: '',
 			cropImgSrc: '',
 			maxWidth: 584,
@@ -13033,83 +13020,51 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 		}
 	},
 
-	watch: {
-		value: function value(_value) {
-			// console.log('watchValue', value);
-
-			this.updateCropper(_value);
-		}
-	},
-
 	methods: {
-		passUpdateValueObject: function passUpdateValueObject(valueObject) {
-			this.$emit('update-value-object', valueObject);
+		passUpdateValueObject: function passUpdateValueObject(parsedValueObject) {
+			this.$emit('update-value-object', parsedValueObject);
 		},
 		updateCropper: function updateCropper(image) {
 			console.log('updateCropper');
-			this.imgSrc = image;
-
-			this.cropImg = image;
-
 			if (this.$refs.cropper) {
 				this.$refs.cropper.replace(image);
 			}
 		},
-		setImage: function setImage(e) {
+		pickImage: function pickImage(e) {
 			var _this = this;
 
-			// console.log('setImage');
-			// console.log('img',e);
 			var file = void 0;
-
 			if (e.raw) {
 				file = e.raw;
 			} else {
 				file = e.target.files[0];
 			}
-
 			if (!file.type.includes('image/')) {
 				alert('Please select an image file');
 				return;
 			}
-
-			this.originalName = file.name;
-			this.originalFileType = file.type;
-
+			// this.originalName = file.name;
+			// this.originalFileType = file.type;
 			if (typeof FileReader === 'function') {
 				var reader = new FileReader();
-
 				reader.onload = function (event) {
-					Object(__WEBPACK_IMPORTED_MODULE_0__utils_image__["a" /* resizeImage */])(event.target.result, file.type, function (_ref) {
-						var dataUrl = _ref.dataUrl,
-						    width = _ref.width,
-						    height = _ref.height,
-						    file = _ref.file;
+					Object(__WEBPACK_IMPORTED_MODULE_0__utils_image__["b" /* resizeImage */])(event.target.result, file.type, function (_ref) {
+						var dataUrl = _ref.dataUrl;
 
-						// console.log('resize');
 						if (dataUrl) {
-							_this.$emit("update-value-object", _extends({}, _this.valueObject, { modified: true, originalBinary: dataUrl }));
-						} else {
-							_this.$emit("update-value-object", {});
+							var newValueObject = _extends({}, _this.parsedValueObject, { modified: true, binaryImg: dataUrl, loaded: true });
+							delete newValueObject.cropBinary;
+							delete newValueObject.cropBoxData;
+							_this.$emit("update-value-object", newValueObject);
+							_this.$emit("update-update-loaded", true);
 						}
 						_this.updateCropper(dataUrl);
-						_this.$emit('input', dataUrl);
-						_this.$emit('setWidth', width);
-						_this.$emit('setHeight', height);
-						_this.$emit('fileChanged', file);
-						_this.$emit('cropFileChanged', file);
-						_this.cropImgSrc = dataUrl;
 					});
 				};
-
 				reader.readAsDataURL(file);
 			} else {
 				alert('Sorry, FileReader API not supported');
 			}
-		},
-		setCropImage: function setCropImage(cropDataUrl) {
-			// console.log('setThumbImage');
-			this.cropImgSrc = cropDataUrl;
 		}
 	}
 });
@@ -13120,8 +13075,8 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 "use strict";
 /* unused harmony export calculateAspectRatioFit */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return resizeImage; });
-/* unused harmony export UrlToBase64 */
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return resizeImage; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return UrlToBase64; });
 var calculateAspectRatioFit = function calculateAspectRatioFit(srcWidth, srcHeight) {
   var maxWidth = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 2000;
   var maxHeight = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1000;
@@ -13153,7 +13108,7 @@ var resizeImage = function resizeImage(image, type, cb) {
         type: type,
         lastModified: Date.now()
       });
-      var params = { dataUrl: dataUrl, width: width, height: height, file: file };
+      var params = { dataUrl: dataUrl };
       cb(params);
     });
   };
@@ -28598,7 +28553,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 			type: String,
 			default: ''
 		},
-		valueObject: Object
+		parsedValueObject: Object
 	},
 
 	data: function data() {
@@ -28619,7 +28574,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 	},
 
 	mounted: function mounted() {
-		console.log('mounted picture cropper');
+		// console.log('mounted picture cropper',this.parsedValueObject);
 		window.addEventListener('resize', this.setWidth);
 		this.buildCropper();
 	},
@@ -28665,7 +28620,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 				var cropBoxData = this.getCropBoxData();
 				console.log('updateCrop');
 				this.$emit('setCropImageSrc', cropFileSrc);
-				this.$emit("update-value-object", _extends({}, this.valueObject, {
+				this.$emit("update-value-object", _extends({}, this.parsedValueObject, {
 					modified: true, cropBinary: cropFileSrc, cropBoxData: cropBoxData }));
 				canvas.toBlob(function (blob) {
 					var type = blob.type;
@@ -32460,7 +32415,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 /* harmony default export */ __webpack_exports__["default"] = ({
 	name: 'PicturePreview',
-	props: ['image', 'cropImage'],
+	props: ['parsedValueObject'],
 
 	data: function data() {
 		return {};
@@ -32485,7 +32440,7 @@ var render = function() {
   return _c("div", { staticClass: "el-row--flex" }, [
     _c("div", { staticClass: "width50" }, [
       _c("div", { staticClass: "full-preview-wrapper" }, [
-        _c("img", { attrs: { src: _vm.image } })
+        _c("img", { attrs: { src: _vm.parsedValueObject.binaryImg } })
       ])
     ]),
     _vm._v(" "),
@@ -32540,7 +32495,7 @@ var render = function() {
                 }
               }
             },
-            [_vm._v(_vm._s(_vm.__("Delete")) + "\n        ")]
+            [_vm._v(_vm._s(_vm.__("Delete")) + "\n            ")]
           ),
           _vm._v(" "),
           _c(
@@ -32561,48 +32516,12 @@ var render = function() {
       "div",
       { staticClass: "cropper-wrapper" },
       [
-        _c("PictureCropper", {
-          directives: [
-            {
-              name: "show",
-              rawName: "v-show",
-              value: _vm.imgSrc,
-              expression: "imgSrc"
-            }
-          ],
-          ref: "cropper",
-          attrs: {
-            image: _vm.imgSrc,
-            ratio: _vm.ratio,
-            "value-object": _vm.valueObject,
-            originalFileType: _vm.originalFileType,
-            originalName: _vm.originalName
-          },
-          on: {
-            "update-value-object": _vm.passUpdateValueObject,
-            setCropImageSrc: _vm.setCropImage
-          }
-        }),
-        _vm._v(" "),
-        !_vm.imgSrc
+        !_vm.loaded
           ? _c("PicturePickerFile", {
               staticClass: "picker-file",
-              on: { change: _vm.setImage }
+              on: { change: _vm.pickImage }
             })
-          : _vm._e(),
-        _vm._v(" "),
-        _c("PicturePreview", {
-          directives: [
-            {
-              name: "show",
-              rawName: "v-show",
-              value: _vm.imgSrc,
-              expression: "imgSrc"
-            }
-          ],
-          ref: "preview",
-          attrs: { image: _vm.imgSrc, cropImage: _vm.cropImgSrc }
-        })
+          : _vm._e()
       ],
       1
     ),
@@ -32691,13 +32610,14 @@ var render = function() {
                   ref: "picturePicker",
                   attrs: {
                     "aspect-ratio": _vm.field.aspectRatio,
-                    "value-object": _vm.valueObject
+                    "parsed-value-object": _vm.parsedValueObject,
+                    loaded: _vm.loaded
                   },
                   on: {
                     "update-value-object": _vm.onUpdateValueObject,
+                    "update-loaded": _vm.onUpdateLoaded,
                     deleteImage: _vm.confirmRemoval,
-                    fileChanged: _vm.setFile,
-                    cropFileChanged: _vm.setCropFile
+                    resetChanges: _vm.confirmReset
                   },
                   model: {
                     value: _vm.value,
@@ -32727,6 +32647,15 @@ var render = function() {
                               on: {
                                 close: _vm.closeRemoveModal,
                                 confirm: _vm.removeFile
+                              }
+                            })
+                          : _vm._e(),
+                        _vm._v(" "),
+                        _vm.resetModalOpen
+                          ? _c("confirm-upload-removal-modal", {
+                              on: {
+                                close: _vm.closeResetModal,
+                                confirm: _vm.resetChanges
                               }
                             })
                           : _vm._e()
