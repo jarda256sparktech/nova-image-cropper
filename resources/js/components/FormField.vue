@@ -7,7 +7,6 @@
                         :aspect-ratio="field.aspectRatio"
                         :parsed-value-object="parsedValueObject"
                         @update-value-object="onUpdateValueObject"
-                        @update-loaded="onUpdateLoaded"
                         @deleteImage="confirmRemoval"
                         @resetChanges="confirmReset"
                         ref="picturePicker"
