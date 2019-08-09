@@ -5,6 +5,11 @@
                 :src="field.thumbnailUrl"
             />
         </div>
+        <div slot="value">
+            <img
+                :src="field.previewUrl"
+            />
+        </div>
     </panel-item>
 </template>
 

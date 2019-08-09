@@ -6,12 +6,22 @@
             style="object-fit: cover;"
             v-if="field.thumbnailUrl"
         />
-        <span v-else>{{ field.value || '&mdash;' }}</span>
+        <img
+            :src="field.previewUrl"
+            class="w-8 h-8"
+            style="object-fit: cover;"
+            v-if="field.previewUrl"
+        />
+        <span v-else>{{ '&mdash;' }}</span>
     </p>
 </template>
 
 <script>
 	export default {
-		props: ['resourceName', 'field']
+		props: ['resourceName', 'field'],
+		computed: {
+		},
+        methods:{
+        }
 	};
 </script>

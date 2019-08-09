@@ -3,20 +3,9 @@
         <input
             :id="hash"
             @change="setImage"
-            accept="image/*"
             class="inputfile"
             name="image"
             style="font-size: 1.2em; padding: 10px 0;"
-            type="file"
-        >
-        <input
-            :id="hashCrop"
-            @change="setCropImage"
-            accept="image/*"
-            class="inputfile"
-            name="image-crop"
-            style="font-size: 1.2em; padding: 10px 0;"
-            type="file"
         >
         <div
             class="bg-30 flex flex-wrap px-8 py-4"
@@ -37,6 +26,8 @@
             <PictureCropper
                 :image="imgSrc"
                 :ratio="ratio"
+                :value-object="valueObject"
+                @update-value-object="passUpdateValueObject"
                 :originalFileType="originalFileType"
                 :originalName="originalName"
                 @setCropImageSrc="setCropImage"
@@ -69,7 +60,7 @@
 
 		components: {PicturePreview, PicturePickerFile, PictureCropper},
 
-		props: ['value', 'aspectRatio'],
+		props: ['value', 'valueObject', 'aspectRatio'],
 
 		data() {
 			return {
@@ -103,12 +94,17 @@
 		},
 
 		watch: {
-			value(image) {
-				this.updateCropper(image)
+			value(value) {
+				// console.log('watchValue', value);
+
+				this.updateCropper(value)
 			}
 		},
 
 		methods: {
+			passUpdateValueObject(valueObject){
+				this.$emit('update-value-object',valueObject);
+            },
 			updateCropper(image) {
 				console.log('updateCropper');
 				this.imgSrc = image;
@@ -149,8 +145,13 @@
 							file.type,
 							({dataUrl, width, height, file}) => {
 								// console.log('resize');
+								if (dataUrl) {
+									this.$emit("update-value-object", {...this.valueObject, modified: true, originalBinary: dataUrl});
+								} else {
+									this.$emit("update-value-object", {});
+								}
 								this.updateCropper(dataUrl);
-								this.$emit('input[name=image]', dataUrl);
+								this.$emit('input', dataUrl);
 								this.$emit('setWidth', width);
 								this.$emit('setHeight', height);
 								this.$emit('fileChanged', file);
@@ -170,23 +171,6 @@
 				// console.log('setThumbImage');
 				this.cropImgSrc = cropDataUrl;
 			},
-
-			// cropImage() {
-			// 	const canvas = this.$refs.cropper.getCroppedCanvas()
-			// 	this.cropImgW = canvas.width
-			// 	this.cropImgH = canvas.height
-			// 	this.cropImg = canvas.toDataURL()
-			// 	canvas.toBlob(blob => {
-			// 		const {type} = blob
-			// 		const file = new File([blob], this.originalName, {
-			// 			type,
-			// 			lastModified: Date.now()
-			// 		})
-			// 		this.$emit('input', this.cropImg)
-			// 		this.$emit('fileChanged', file)
-			// 		this.$emit('finished')
-			// 	}, this.originalFileType)
-			// }
 		}
 	}
 </script>

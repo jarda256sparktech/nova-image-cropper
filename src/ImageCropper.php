@@ -2,11 +2,13 @@
 
 namespace jarda256sparktech\NovaImageCropper;
 
-use Laravel\Nova\Fields\Image;
 use Illuminate\Support\Facades\Storage;
+use Laravel\Nova\Fields\Field;
+use Laravel\Nova\Fields\Image;
 
 class ImageCropper extends Image
 {
+
     /**
      * The field's component.
      *
@@ -14,49 +16,35 @@ class ImageCropper extends Image
      */
     public $component = 'nova-image-cropper';
 
-    public $cropFileColumn = 'image_crop';
-    public $cropDefineColumn = 'image_crop_define';
-
-    /**
-     * Create a new field.
-     *
-     * @param  string  $name
-     * @param  string|null  $attribute
-     * @param  string|null  $disk
-     * @param  callable|null  $storageCallback
-     * @return void
-     */
-    public function __construct($name, $attribute = null, $disk = 'public', $storageCallback = null)
-    {
-        parent::__construct($name, $attribute, $disk, $storageCallback);
-
-        $this->preview(function () {
-            if (!$this->value) {
-                return null;
-            }
-
-            $url = Storage::disk($this->disk)->url($this->value);
-
-            $path_info = pathinfo($url);
-
-            $filetype = 'jpg';
-
-            if (array_key_exists('extension', $path_info)) {
-                $filetype = $path_info['extension'];
-            }
-
-            try {
-                $encoded_file = base64_encode(file_get_contents($url));
-            } catch (\Exception $e) {
-                return '';
-            }
-
-            return 'data:image/' . $filetype . ';base64,' . $encoded_file;
-        });
-    }
+    public $disk;
 
     public function aspectRatio($ratio)
     {
         return $this->withMeta(['aspectRatio' => $ratio]);
+    }
+
+    public function __construct($name, $attribute = null, $disk = 'public', $storageCallback = null)
+    {
+        parent::__construct($name, $attribute);
+
+        $this->disk = $disk;
+
+        $this->thumbnail(function () {
+            $parsedValue = json_decode($this->value, true);
+            return $parsedValue ? Storage::disk($this->disk)->url($parsedValue['imageSrc']) : null;
+        })->preview(function () {
+            $parsedValue = json_decode($this->value, true);
+            return $parsedValue ? Storage::disk($this->disk)->url($parsedValue['cropSrc']) : null;
+        })->download(function ($request, $model) {
+            $name = $this->originalNameColumn ? $model->{$this->originalNameColumn} : null;
+
+            return Storage::disk($this->disk)->download($this->value, $name);
+        })->delete(function () {
+            if ($this->value) {
+                Storage::disk($this->disk)->delete($this->value);
+
+                return $this->columnsThatShouldBeDeleted();
+            }
+        });
     }
 }

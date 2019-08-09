@@ -34,7 +34,8 @@
 			originalName: {
 				type: String,
 				default: ''
-			}
+			},
+			valueObject: Object
 		},
 
 		data() {
@@ -54,6 +55,7 @@
 		},
 
 		mounted() {
+			console.log('mounted picture cropper');
 			window.addEventListener('resize', this.setWidth);
 			this.buildCropper()
 		},
@@ -61,7 +63,6 @@
 		destroyed() {
 			window.removeEventListener('resize', this.setWidth);
 			this.cropper.destroy()
-			// this.$refs.img.removeEventListener('cropmove', this.updateThumb);
 		},
 
 		methods: {
@@ -96,7 +97,11 @@
 				if (canvas) {
 					// console.log('updateThumb');
 					const cropFileSrc = canvas.toDataURL();
+					const cropBoxData = this.getCropBoxData();
+					console.log('updateCrop');
 					this.$emit('setCropImageSrc', cropFileSrc);
+					this.$emit("update-value-object", {...this.valueObject,
+                        modified: true,cropBinary:cropFileSrc,cropBoxData:cropBoxData});
 					canvas.toBlob(blob => {
 						const {type} = blob;
 						const file = new File([blob], this.originalName, {
@@ -124,6 +129,12 @@
 					return
 				}
 				return this.cropper.getCroppedCanvas()
+			},
+			getCropBoxData() {
+				if (!this.cropper) {
+					return
+				}
+				return this.cropper.getCropBoxData()
 			},
 
 			replace(image) {
