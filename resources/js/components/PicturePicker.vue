@@ -1,15 +1,14 @@
 <template>
-    <div :class="{ 'picker-wrapper': imgSrc }">
+    <div :class="{ 'picker-wrapper': parsedValueObject.loaded }">
         <input
             :id="hash"
-            @change="setImage"
             class="inputfile"
             name="image"
             style="font-size: 1.2em; padding: 10px 0;"
         >
         <div
             class="bg-30 flex flex-wrap px-8 py-4"
-            v-if="imgSrc"
+            v-if="parsedValueObject.loaded"
         >
             <div
                 @click="$emit('deleteImage')"
@@ -23,25 +22,26 @@
         </div>
         <br>
         <div class="cropper-wrapper">
-<!--            <PictureCropper-->
-<!--                :ratio="ratio"-->
-<!--                :parsed-value-object="parsedValueObject"-->
-<!--                @update-value-object="passUpdateValueObject"-->
-<!--                :originalFileType="originalFileType"-->
-<!--                :originalName="originalName"-->
-<!--                ref="cropper"-->
-<!--                v-show="loaded"-->
-<!--            />-->
+            <PictureCropper
+                :image="parsedValueObject.binaryImg"
+                :ratio="ratio"
+                :parsed-value-object="parsedValueObject"
+                @update-value-object="passUpdateValueObject"
+                :originalFileType="originalFileType"
+                :originalName="originalName"
+                ref="cropper"
+                v-show="parsedValueObject.loaded"
+            />
             <PicturePickerFile
                 @change="pickImage"
                 class="picker-file"
-                v-if="!loaded"
+                v-if="!parsedValueObject.loaded"
             />
-<!--            <PicturePreview-->
-<!--                :parsed-value-object="parsedValueObject"-->
-<!--                ref="preview"-->
-<!--                v-show="loaded"-->
-<!--            />-->
+            <PicturePreview
+                ref="preview"
+                :parsed-value-object="parsedValueObject"
+                v-show="parsedValueObject.loaded"
+            />
         </div>
         <br>
     </div>
@@ -57,7 +57,7 @@
 
 		components: {PicturePreview, PicturePickerFile, PictureCropper},
 
-		props: ['value', 'parsedValueObject', 'aspectRatio','loaded'],
+		props: ['value', 'parsedValueObject', 'aspectRatio', 'loaded'],
 
 		data() {
 			return {
@@ -84,18 +84,18 @@
 				return {
 					padding: '10px 20px'
 				}
-			}
+			},
 		},
 
 		methods: {
-			passUpdateValueObject(parsedValueObject){
-				this.$emit('update-value-object',parsedValueObject);
-            },
+			passUpdateValueObject(parsedValueObject) {
+				this.$emit('update-value-object', parsedValueObject);
+			},
 			updateCropper(image) {
-				console.log('updateCropper');
-				if (this.$refs.cropper) {
-					this.$refs.cropper.replace(image)
-				}
+				// console.log('updateCropper');
+				// if (this.$refs.cropper) {
+				// 	this.$refs.cropper.replace(image)
+				// }
 			},
 
 			pickImage(e) {
@@ -119,12 +119,10 @@
 							file.type,
 							({dataUrl}) => {
 								if (dataUrl) {
-									let newValueObject = {...this.parsedValueObject, modified: true, binaryImg:
-                                        dataUrl,loaded:true};
-									delete newValueObject.cropBinary;
-									delete newValueObject.cropBoxData;
-									this.$emit("update-value-object", newValueObject);
-									this.$emit("update-update-loaded", true);
+									this.parsedValueObject ={
+										...this.parsedValueObject, modified: true, binaryImg:
+										dataUrl, cropImg: null, loaded: true, cropBinary: null, cropBoxData: null
+									};
 								}
 								this.updateCropper(dataUrl);
 							}

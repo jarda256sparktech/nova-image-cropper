@@ -1583,7 +1583,7 @@ exports = module.exports = __webpack_require__(0)(false);
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
 
 // exports
 
@@ -1603,9 +1603,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils_image__ = __webpack_require__(33);
 
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
-//
 //
 //
 //
@@ -1663,12 +1664,19 @@ __webpack_require__(72);
 	data: function data() {
 		return {
 			isNew: false,
-			parsedValueObject: {},
+			parsedValueObject: {
+				modified: false,
+				loaded: false,
+				binaryImg: null,
+				binaryCrop: null,
+				cropBoxData: null,
+				imgSrc: null,
+				cropSrc: null
+			},
 			originalValueObject: {},
 			editingImage: true,
 			resetModalOpen: false,
 			removeModalOpen: false,
-			loaded: false,
 			deleting: false,
 			uploadErrors: new __WEBPACK_IMPORTED_MODULE_1_laravel_nova__["Errors"]()
 		};
@@ -1683,7 +1691,7 @@ __webpack_require__(72);
 	watch: {
 		parsedValueObject: function parsedValueObject() {
 			var stringObject = JSON.stringify(this.parsedValueObject);
-			console.log('watch val object', stringObject);
+			console.log('watch val object');
 			this.value = stringObject;
 		}
 	},
@@ -1691,9 +1699,9 @@ __webpack_require__(72);
 	beforeMount: function beforeMount() {
 		// console.log('before mounted FormField');
 		this.value = this.field.value || '';
-		var parsedValueObject = JSON.parse(this.field.value) || {};
-		parsedValueObject.modified = false;
 
+		var parsedValueFromJson = JSON.parse(this.field.value);
+		this.parsedValueObject = _extends({}, this.parsedValueObject, parsedValueFromJson);
 		if (!this.isNew) {
 			// let file = new File(this.field.previewUrl);
 			// if (typeof FileReader === 'function') {
@@ -1707,72 +1715,60 @@ __webpack_require__(72);
 			// }
 			//
 			this.parsedValueObject.binaryImg = Object(__WEBPACK_IMPORTED_MODULE_3__utils_image__["a" /* UrlToBase64 */])(this.field.previewUrl);
-			this.originalValueObject = parsedValueObject;
+			this.originalValueObject = this.parsedValueObject;
 		}
-		this.parsedValueObject = parsedValueObject;
 	},
 
 
 	methods: {
-		resetFile: function resetFile(file) {
-			this.file = null;
-			this.cropFile = null;
-			this.fileName = '';
-			this.value = '';
-			this.parsedValueObject = {};
-		},
 		removeFile: function () {
 			var _ref = _asyncToGenerator( /*#__PURE__*/__WEBPACK_IMPORTED_MODULE_0_babel_runtime_regenerator___default.a.mark(function _callee() {
-				var resourceName, resourceId, relatedResourceName, relatedResourceId, viaRelationship, attribute, uri;
 				return __WEBPACK_IMPORTED_MODULE_0_babel_runtime_regenerator___default.a.wrap(function _callee$(_context) {
 					while (1) {
 						switch (_context.prev = _context.next) {
 							case 0:
 								this.closeRemoveModal();
+								alert('remove');
+								// if (this.isNew) {
+								// 	this.resetFile();
+								// 	return
+								// }
+								//
+								// this.deleting = true;
+								// this.uploadErrors = new Errors();
+								//
+								// const {
+								// 	resourceName,
+								// 	resourceId,
+								// 	relatedResourceName,
+								// 	relatedResourceId,
+								// 	viaRelationship
+								// } = this;
+								// const attribute = this.field.attribute;
+								//
+								// const uri = this.viaRelationship
+								// 	? `/nova-api/${resourceName}/${resourceId}/${relatedResourceName}/${relatedResourceId}/field/${attribute}?viaRelationship=${viaRelationship}`
+								// 	: `/nova-api/${resourceName}/${resourceId}/field/${attribute}`;
+								//
+								// try {
+								// 	await Nova.request().delete(uri);
+								// 	this.deleting = false;
+								// 	this.resetFile();
+								// 	this.$emit('file-deleted')
+								// } catch (error) {
+								// 	this.deleting = false;
+								//
+								// 	if (error.response.status == 422) {
+								// 		this.uploadErrors = new Errors(error.response.data.errors)
+								// 	}
+								// }
 
-								if (!this.isNew) {
-									_context.next = 4;
-									break;
-								}
-
-								this.resetFile();
-								return _context.abrupt('return');
-
-							case 4:
-
-								this.deleting = true;
-								this.uploadErrors = new __WEBPACK_IMPORTED_MODULE_1_laravel_nova__["Errors"]();
-
-								resourceName = this.resourceName, resourceId = this.resourceId, relatedResourceName = this.relatedResourceName, relatedResourceId = this.relatedResourceId, viaRelationship = this.viaRelationship;
-								attribute = this.field.attribute;
-								uri = this.viaRelationship ? '/nova-api/' + resourceName + '/' + resourceId + '/' + relatedResourceName + '/' + relatedResourceId + '/field/' + attribute + '?viaRelationship=' + viaRelationship : '/nova-api/' + resourceName + '/' + resourceId + '/field/' + attribute;
-								_context.prev = 9;
-								_context.next = 12;
-								return Nova.request().delete(uri);
-
-							case 12:
-								this.deleting = false;
-								this.resetFile();
-								this.$emit('file-deleted');
-								_context.next = 21;
-								break;
-
-							case 17:
-								_context.prev = 17;
-								_context.t0 = _context['catch'](9);
-
-								this.deleting = false;
-
-								if (_context.t0.response.status == 422) {
-									this.uploadErrors = new __WEBPACK_IMPORTED_MODULE_1_laravel_nova__["Errors"](_context.t0.response.data.errors);
-								}
-
-							case 21:
+							case 2:
 							case 'end':
 								return _context.stop();
 						}
 					}
-				}, _callee, this, [[9, 17]]);
+				}, _callee, this);
 			}));
 
 			function removeFile() {
@@ -1781,20 +1777,9 @@ __webpack_require__(72);
 
 			return removeFile;
 		}(),
-
-
-		/**
-   * Update the field's internal value.
-   */
-		handleChange: function handleChange(value) {
-			this.value = value;
-		},
 		onUpdateValueObject: function onUpdateValueObject(newValueObject) {
-			console.log('onUpdateValueObject', newValueObject);
+			console.log('onUpdateValueObject');
 			this.parsedValueObject = newValueObject;
-		},
-		onUpdateLoaded: function onUpdateLoaded(value) {
-			this.loaded = value;
 		},
 		confirmRemoval: function confirmRemoval() {
 			this.removeModalOpen = true;
@@ -1810,11 +1795,6 @@ __webpack_require__(72);
 		},
 		resetChanges: function resetChanges() {
 			this.parsedValueObject = this.originalValueObject;
-			this.file = null;
-			this.cropFile = null;
-			this.fileName = '';
-			this.value = '';
-			this.parsedValueObject = {};
 		}
 	}
 });
@@ -13025,10 +13005,10 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 			this.$emit('update-value-object', parsedValueObject);
 		},
 		updateCropper: function updateCropper(image) {
-			console.log('updateCropper');
-			if (this.$refs.cropper) {
-				this.$refs.cropper.replace(image);
-			}
+			// console.log('updateCropper');
+			// if (this.$refs.cropper) {
+			// 	this.$refs.cropper.replace(image)
+			// }
 		},
 		pickImage: function pickImage(e) {
 			var _this = this;
@@ -13052,11 +13032,8 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 						var dataUrl = _ref.dataUrl;
 
 						if (dataUrl) {
-							var newValueObject = _extends({}, _this.parsedValueObject, { modified: true, binaryImg: dataUrl, loaded: true });
-							delete newValueObject.cropBinary;
-							delete newValueObject.cropBoxData;
-							_this.$emit("update-value-object", newValueObject);
-							_this.$emit("update-update-loaded", true);
+							_this.parsedValueObject = _extends({}, _this.parsedValueObject, { modified: true, binaryImg: dataUrl, cropImg: null, loaded: true, cropBinary: null, cropBoxData: null
+							});
 						}
 						_this.updateCropper(dataUrl);
 					});
@@ -28575,11 +28552,11 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 	mounted: function mounted() {
 		// console.log('mounted picture cropper',this.parsedValueObject);
-		window.addEventListener('resize', this.setWidth);
+		// window.addEventListener('resize', this.setWidth);
 		this.buildCropper();
 	},
 	destroyed: function destroyed() {
-		window.removeEventListener('resize', this.setWidth);
+		// window.removeEventListener('resize', this.setWidth);
 		this.cropper.destroy();
 	},
 
@@ -28611,8 +28588,6 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 			this.cropper.replace(this.image);
 		},
 		updateCrop: function updateCrop() {
-			var _this = this;
-
 			var canvas = this.getCroppedCanvas();
 			if (canvas) {
 				// console.log('updateThumb');
@@ -28622,16 +28597,6 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 				this.$emit('setCropImageSrc', cropFileSrc);
 				this.$emit("update-value-object", _extends({}, this.parsedValueObject, {
 					modified: true, cropBinary: cropFileSrc, cropBoxData: cropBoxData }));
-				canvas.toBlob(function (blob) {
-					var type = blob.type;
-
-					var file = new File([blob], _this.originalName, {
-						type: type,
-						lastModified: Date.now()
-					});
-					// console.log(file,thumbFileSrc);
-					_this.$emit('CropFileChanged', file);
-				}, this.originalFileType);
 			}
 		},
 		setWidth: function setWidth() {
@@ -28658,7 +28623,6 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 			this.image = image;
 
 			this.buildCropper();
-			this.$emit('cropFileChanged', image);
 		}
 	}
 });
@@ -32474,60 +32438,96 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { class: { "picker-wrapper": _vm.imgSrc } }, [
-    _c("input", {
-      staticClass: "inputfile",
-      staticStyle: { "font-size": "1.2em", padding: "10px 0" },
-      attrs: { id: _vm.hash, name: "image" },
-      on: { change: _vm.setImage }
-    }),
-    _vm._v(" "),
-    _vm.imgSrc
-      ? _c("div", { staticClass: "bg-30 flex flex-wrap px-8 py-4" }, [
-          _c(
-            "div",
-            {
-              staticClass:
-                "btn btn-default btn-primary mr-3 mb-2 cursor-pointer",
-              on: {
-                click: function($event) {
-                  return _vm.$emit("deleteImage")
+  return _c(
+    "div",
+    { class: { "picker-wrapper": _vm.parsedValueObject.loaded } },
+    [
+      _c("input", {
+        staticClass: "inputfile",
+        staticStyle: { "font-size": "1.2em", padding: "10px 0" },
+        attrs: { id: _vm.hash, name: "image" }
+      }),
+      _vm._v(" "),
+      _vm.parsedValueObject.loaded
+        ? _c("div", { staticClass: "bg-30 flex flex-wrap px-8 py-4" }, [
+            _c(
+              "div",
+              {
+                staticClass:
+                  "btn btn-default btn-primary mr-3 mb-2 cursor-pointer",
+                on: {
+                  click: function($event) {
+                    return _vm.$emit("deleteImage")
+                  }
                 }
+              },
+              [_vm._v(_vm._s(_vm.__("Delete")) + "\n        ")]
+            ),
+            _vm._v(" "),
+            _c(
+              "label",
+              {
+                staticClass:
+                  "btn btn-default btn-primary mr-3 mb-2 cursor-pointer",
+                attrs: { for: _vm.hash }
+              },
+              [_vm._v(_vm._s(_vm.__("Change Image")))]
+            )
+          ])
+        : _vm._e(),
+      _vm._v(" "),
+      _c("br"),
+      _vm._v(" "),
+      _c(
+        "div",
+        { staticClass: "cropper-wrapper" },
+        [
+          _c("PictureCropper", {
+            directives: [
+              {
+                name: "show",
+                rawName: "v-show",
+                value: _vm.parsedValueObject.loaded,
+                expression: "parsedValueObject.loaded"
               }
+            ],
+            ref: "cropper",
+            attrs: {
+              image: _vm.parsedValueObject.binaryImg,
+              ratio: _vm.ratio,
+              "parsed-value-object": _vm.parsedValueObject,
+              originalFileType: _vm.originalFileType,
+              originalName: _vm.originalName
             },
-            [_vm._v(_vm._s(_vm.__("Delete")) + "\n            ")]
-          ),
+            on: { "update-value-object": _vm.passUpdateValueObject }
+          }),
           _vm._v(" "),
-          _c(
-            "label",
-            {
-              staticClass:
-                "btn btn-default btn-primary mr-3 mb-2 cursor-pointer",
-              attrs: { for: _vm.hash }
-            },
-            [_vm._v(_vm._s(_vm.__("Change Image")))]
-          )
-        ])
-      : _vm._e(),
-    _vm._v(" "),
-    _c("br"),
-    _vm._v(" "),
-    _c(
-      "div",
-      { staticClass: "cropper-wrapper" },
-      [
-        !_vm.loaded
-          ? _c("PicturePickerFile", {
-              staticClass: "picker-file",
-              on: { change: _vm.pickImage }
-            })
-          : _vm._e()
-      ],
-      1
-    ),
-    _vm._v(" "),
-    _c("br")
-  ])
+          !_vm.parsedValueObject.loaded
+            ? _c("PicturePickerFile", {
+                staticClass: "picker-file",
+                on: { change: _vm.pickImage }
+              })
+            : _vm._e(),
+          _vm._v(" "),
+          _c("PicturePreview", {
+            directives: [
+              {
+                name: "show",
+                rawName: "v-show",
+                value: _vm.parsedValueObject.loaded,
+                expression: "parsedValueObject.loaded"
+              }
+            ],
+            ref: "preview",
+            attrs: { "parsed-value-object": _vm.parsedValueObject }
+          })
+        ],
+        1
+      ),
+      _vm._v(" "),
+      _c("br")
+    ]
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -32610,8 +32610,7 @@ var render = function() {
                   ref: "picturePicker",
                   attrs: {
                     "aspect-ratio": _vm.field.aspectRatio,
-                    "parsed-value-object": _vm.parsedValueObject,
-                    loaded: _vm.loaded
+                    "parsed-value-object": _vm.parsedValueObject
                   },
                   on: {
                     "update-value-object": _vm.onUpdateValueObject,
@@ -32647,15 +32646,6 @@ var render = function() {
                               on: {
                                 close: _vm.closeRemoveModal,
                                 confirm: _vm.removeFile
-                              }
-                            })
-                          : _vm._e(),
-                        _vm._v(" "),
-                        _vm.resetModalOpen
-                          ? _c("confirm-upload-removal-modal", {
-                              on: {
-                                close: _vm.closeResetModal,
-                                confirm: _vm.resetChanges
                               }
                             })
                           : _vm._e()

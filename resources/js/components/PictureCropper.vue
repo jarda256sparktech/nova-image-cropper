@@ -56,12 +56,12 @@
 
 		mounted() {
 			// console.log('mounted picture cropper',this.parsedValueObject);
-			window.addEventListener('resize', this.setWidth);
+			// window.addEventListener('resize', this.setWidth);
 			this.buildCropper()
 		},
 
 		destroyed() {
-			window.removeEventListener('resize', this.setWidth);
+			// window.removeEventListener('resize', this.setWidth);
 			this.cropper.destroy()
 		},
 
@@ -102,15 +102,7 @@
 					this.$emit('setCropImageSrc', cropFileSrc);
 					this.$emit("update-value-object", {...this.parsedValueObject,
                         modified: true,cropBinary:cropFileSrc,cropBoxData:cropBoxData});
-					canvas.toBlob(blob => {
-						const {type} = blob;
-						const file = new File([blob], this.originalName, {
-							type,
-							lastModified: Date.now()
-						});
-						// console.log(file,thumbFileSrc);
-						this.$emit('CropFileChanged', file);
-					}, this.originalFileType);
+
 				}
 			},
 
@@ -141,7 +133,6 @@
 				this.image = image;
 
 				this.buildCropper();
-				this.$emit('cropFileChanged', image)
 			}
 		}
 	}

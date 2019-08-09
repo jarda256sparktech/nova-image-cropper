@@ -7,7 +7,6 @@
                         :aspect-ratio="field.aspectRatio"
                         :parsed-value-object="parsedValueObject"
                         @update-value-object="onUpdateValueObject"
-                        :loaded="loaded"
                         @update-loaded="onUpdateLoaded"
                         @deleteImage="confirmRemoval"
                         @resetChanges="confirmReset"
@@ -26,11 +25,11 @@
                                 @confirm="removeFile"
                                 v-if="removeModalOpen"
                             />
-                            <confirm-upload-removal-modal
-                                @close="closeResetModal"
-                                @confirm="resetChanges"
-                                v-if="resetModalOpen"
-                            />
+<!--                            <confirm-upload-removal-modal-->
+<!--                                @close="closeResetModal"-->
+<!--                                @confirm="resetChanges"-->
+<!--                                v-if="resetModalOpen"-->
+<!--                            />-->
                         </transition>
                     </portal>
                 </div>
@@ -56,12 +55,19 @@
 		data() {
 			return {
 				isNew: false,
-				parsedValueObject: {},
+				parsedValueObject: {
+					modified: false,
+					loaded: false,
+                    binaryImg:null,
+                    binaryCrop:null,
+                    cropBoxData:null,
+                    imgSrc: null,
+                    cropSrc: null,
+                },
 				originalValueObject: {},
 				editingImage: true,
 				resetModalOpen: false,
 				removeModalOpen: false,
-				loaded: false,
 				deleting: false,
 				uploadErrors: new Errors()
 			}
@@ -70,22 +76,23 @@
 		computed: {
 			isNew() {
 				return !Boolean(this.field.previewUrl)
-			}
+			},
 		},
 		watch: {
 			parsedValueObject() {
 				let stringObject = JSON.stringify(this.parsedValueObject);
-				console.log('watch val object', stringObject);
+				console.log('watch val object');
 				this.value = stringObject;
+
 			}
 		},
 
 		beforeMount() {
 			// console.log('before mounted FormField');
 			this.value = this.field.value || '';
-			let parsedValueObject = JSON.parse(this.field.value) || {};
-			parsedValueObject.modified = false;
 
+			let parsedValueFromJson = JSON.parse(this.field.value);
+			this.parsedValueObject = {...this.parsedValueObject,...parsedValueFromJson};
 			if (!this.isNew) {
 				// let file = new File(this.field.previewUrl);
 				// if (typeof FileReader === 'function') {
@@ -99,72 +106,52 @@
 				// }
 				//
 				this.parsedValueObject.binaryImg = UrlToBase64(this.field.previewUrl);
-				this.originalValueObject = parsedValueObject;
+				this.originalValueObject = this.parsedValueObject;
 			}
-			this.parsedValueObject = parsedValueObject;
 		},
 
 		methods: {
-			resetFile(file) {
-				this.file = null;
-				this.cropFile = null;
-				this.fileName = '';
-				this.value = '';
-				this.parsedValueObject = {};
-			},
-
-
 			async removeFile() {
 				this.closeRemoveModal();
-
-				if (this.isNew) {
-					this.resetFile();
-					return
-				}
-
-				this.deleting = true;
-				this.uploadErrors = new Errors();
-
-				const {
-					resourceName,
-					resourceId,
-					relatedResourceName,
-					relatedResourceId,
-					viaRelationship
-				} = this;
-				const attribute = this.field.attribute;
-
-				const uri = this.viaRelationship
-					? `/nova-api/${resourceName}/${resourceId}/${relatedResourceName}/${relatedResourceId}/field/${attribute}?viaRelationship=${viaRelationship}`
-					: `/nova-api/${resourceName}/${resourceId}/field/${attribute}`;
-
-				try {
-					await Nova.request().delete(uri);
-					this.deleting = false;
-					this.resetFile();
-					this.$emit('file-deleted')
-				} catch (error) {
-					this.deleting = false;
-
-					if (error.response.status == 422) {
-						this.uploadErrors = new Errors(error.response.data.errors)
-					}
-				}
-			},
-
-			/**
-			 * Update the field's internal value.
-			 */
-			handleChange(value) {
-				this.value = value
+                alert('remove');
+				// if (this.isNew) {
+				// 	this.resetFile();
+				// 	return
+				// }
+                //
+				// this.deleting = true;
+				// this.uploadErrors = new Errors();
+                //
+				// const {
+				// 	resourceName,
+				// 	resourceId,
+				// 	relatedResourceName,
+				// 	relatedResourceId,
+				// 	viaRelationship
+				// } = this;
+				// const attribute = this.field.attribute;
+                //
+				// const uri = this.viaRelationship
+				// 	? `/nova-api/${resourceName}/${resourceId}/${relatedResourceName}/${relatedResourceId}/field/${attribute}?viaRelationship=${viaRelationship}`
+				// 	: `/nova-api/${resourceName}/${resourceId}/field/${attribute}`;
+                //
+				// try {
+				// 	await Nova.request().delete(uri);
+				// 	this.deleting = false;
+				// 	this.resetFile();
+				// 	this.$emit('file-deleted')
+				// } catch (error) {
+				// 	this.deleting = false;
+                //
+				// 	if (error.response.status == 422) {
+				// 		this.uploadErrors = new Errors(error.response.data.errors)
+				// 	}
+				// }
 			},
 
 			onUpdateValueObject(newValueObject) {
-				console.log('onUpdateValueObject', newValueObject);
+				console.log('onUpdateValueObject');
 				this.parsedValueObject = newValueObject;
-			},
-			onUpdateLoaded(value) {
-				this.loaded = value;
 			},
 			confirmRemoval() {
 				this.removeModalOpen = true
@@ -180,11 +167,6 @@
 			},
 			resetChanges() {
 				this.parsedValueObject = this.originalValueObject;
-				this.file = null;
-				this.cropFile = null;
-				this.fileName = '';
-				this.value = '';
-				this.parsedValueObject = {};
 			},
 		}
 	}
