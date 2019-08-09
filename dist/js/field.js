@@ -1583,7 +1583,7 @@ exports = module.exports = __webpack_require__(0)(false);
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
 
 // exports
 
@@ -1639,7 +1639,6 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 //
 //
 //
-//
 
 
 
@@ -1655,39 +1654,59 @@ __webpack_require__(72);
 
 	data: function data() {
 		return {
+			isNew: false,
+			valueObject: {},
+			originalValueObject: {},
+			editingImage: true,
+			resetModalOpen: false,
+			removeModalOpen: false,
 			deleting: false,
-			editingImage: false,
+
 			cropFile: null,
 			file: null,
 			origFile: null,
 			fileName: '',
-			removeModalOpen: false,
-			valueObject: {},
 			uploadErrors: new __WEBPACK_IMPORTED_MODULE_1_laravel_nova__["Errors"]()
 		};
 	},
 
 
 	computed: {
-		/**
-   * Determine if should hit the endpoint for delete
-   */
-		imageExistsOnServer: function imageExistsOnServer() {
-			return Boolean(this.field.previewUrl);
+		isNew: function isNew() {
+			return !Boolean(this.field.previewUrl);
+		}
+	},
+	watch: {
+		valueObject: function valueObject(value) {
+			this.value = JSON.stringify(value);
 		}
 	},
 
-	mounted: function mounted() {
-		console.log('mounted field', this.field);
+	beforeMount: function beforeMount() {
+		var _this = this;
+
+		console.log('before mounted FormField');
 		this.value = this.field.value || '';
 		this.valueObject = JSON.parse(this.field.value) || {};
+		this.valueObject.modified = false;
+		if (!this.isNew) {
+			var file = new File(this.field.previewUrl);
+			if (typeof FileReader === 'function') {
+				var reader = new FileReader();
+				reader.onload = function (event) {
+					_this.valueObject.binaryImg = event.target.result;
+				};
+				reader.readAsDataURL(file);
+			} else {
+				alert('Sorry, FileReader API not supported');
+			}
+			this.originalValueObject = this.valueObject;
+		}
 	},
 
 
 	methods: {
 		setFile: function setFile(file) {
-			this.editingImage = true;
-			// console.log('setFile');
 			this.file = file;
 			this.fileName = file.name;
 		},
@@ -1707,68 +1726,22 @@ __webpack_require__(72);
 			this.value = '';
 			this.valueObject = {};
 		},
-
-
-		/**
-   * Confirm removal of the linked file
-   */
-		confirmRemoval: function confirmRemoval() {
-			// this.editingImage = false
-			this.removeModalOpen = true;
-		},
-
-
-		/**
-   * Close the upload removal modal
-   */
-		closeRemoveModal: function closeRemoveModal() {
-			this.removeModalOpen = false;
-			// this.editingImage = true
-		},
-		deleteImage: function () {
-			var _ref = _asyncToGenerator( /*#__PURE__*/__WEBPACK_IMPORTED_MODULE_0_babel_runtime_regenerator___default.a.mark(function _callee(index) {
+		removeFile: function () {
+			var _ref = _asyncToGenerator( /*#__PURE__*/__WEBPACK_IMPORTED_MODULE_0_babel_runtime_regenerator___default.a.mark(function _callee() {
+				var resourceName, resourceId, relatedResourceName, relatedResourceId, viaRelationship, attribute, uri;
 				return __WEBPACK_IMPORTED_MODULE_0_babel_runtime_regenerator___default.a.wrap(function _callee$(_context) {
 					while (1) {
 						switch (_context.prev = _context.next) {
 							case 0:
-								axios.delete('/nova-vendor/nova-image-cropper/delete/');
-								this.images = {};
-								this.value = '';
-
-							case 3:
-							case 'end':
-								return _context.stop();
-						}
-					}
-				}, _callee, this);
-			}));
-
-			function deleteImage(_x) {
-				return _ref.apply(this, arguments);
-			}
-
-			return deleteImage;
-		}(),
-
-		/**
-   * Remove the linked file from storage
-   */
-		removeFile: function () {
-			var _ref2 = _asyncToGenerator( /*#__PURE__*/__WEBPACK_IMPORTED_MODULE_0_babel_runtime_regenerator___default.a.mark(function _callee2() {
-				var resourceName, resourceId, relatedResourceName, relatedResourceId, viaRelationship, attribute, uri;
-				return __WEBPACK_IMPORTED_MODULE_0_babel_runtime_regenerator___default.a.wrap(function _callee2$(_context2) {
-					while (1) {
-						switch (_context2.prev = _context2.next) {
-							case 0:
 								this.closeRemoveModal();
 
-								if (this.imageExistsOnServer) {
-									_context2.next = 4;
+								if (!this.isNew) {
+									_context.next = 4;
 									break;
 								}
 
 								this.resetFile();
-								return _context2.abrupt('return');
+								return _context.abrupt('return');
 
 							case 4:
 
@@ -1778,37 +1751,37 @@ __webpack_require__(72);
 								resourceName = this.resourceName, resourceId = this.resourceId, relatedResourceName = this.relatedResourceName, relatedResourceId = this.relatedResourceId, viaRelationship = this.viaRelationship;
 								attribute = this.field.attribute;
 								uri = this.viaRelationship ? '/nova-api/' + resourceName + '/' + resourceId + '/' + relatedResourceName + '/' + relatedResourceId + '/field/' + attribute + '?viaRelationship=' + viaRelationship : '/nova-api/' + resourceName + '/' + resourceId + '/field/' + attribute;
-								_context2.prev = 9;
-								_context2.next = 12;
+								_context.prev = 9;
+								_context.next = 12;
 								return Nova.request().delete(uri);
 
 							case 12:
 								this.deleting = false;
 								this.resetFile();
 								this.$emit('file-deleted');
-								_context2.next = 21;
+								_context.next = 21;
 								break;
 
 							case 17:
-								_context2.prev = 17;
-								_context2.t0 = _context2['catch'](9);
+								_context.prev = 17;
+								_context.t0 = _context['catch'](9);
 
 								this.deleting = false;
 
-								if (_context2.t0.response.status == 422) {
-									this.uploadErrors = new __WEBPACK_IMPORTED_MODULE_1_laravel_nova__["Errors"](_context2.t0.response.data.errors);
+								if (_context.t0.response.status == 422) {
+									this.uploadErrors = new __WEBPACK_IMPORTED_MODULE_1_laravel_nova__["Errors"](_context.t0.response.data.errors);
 								}
 
 							case 21:
 							case 'end':
-								return _context2.stop();
+								return _context.stop();
 						}
 					}
-				}, _callee2, this, [[9, 17]]);
+				}, _callee, this, [[9, 17]]);
 			}));
 
 			function removeFile() {
-				return _ref2.apply(this, arguments);
+				return _ref.apply(this, arguments);
 			}
 
 			return removeFile;
@@ -1822,11 +1795,6 @@ __webpack_require__(72);
 		//
 		// },
 
-		fill: function fill(formData) {
-			formData.append(this.field.attribute, this.value || '');
-		},
-
-
 		/**
    * Update the field's internal value.
    */
@@ -1836,6 +1804,26 @@ __webpack_require__(72);
 		onUpdateValueObject: function onUpdateValueObject(valueObject) {
 			console.log('onUpdateValueObject', valueObject);
 			this.valueObject = valueObject;
+		},
+		confirmRemoval: function confirmRemoval() {
+			this.removeModalOpen = true;
+		},
+		closeRemoveModal: function closeRemoveModal() {
+			this.removeModalOpen = false;
+		},
+		confirmReset: function confirmReset() {
+			this.resetModalOpen = true;
+		},
+		closeResetModal: function closeResetModal() {
+			this.resetModalOpen = false;
+		},
+		resetChanges: function resetChanges() {
+			this.valueObject = this.originalValueObject;
+			this.file = null;
+			this.cropFile = null;
+			this.fileName = '';
+			this.value = '';
+			this.valueObject = {};
 		}
 	}
 });
@@ -32700,14 +32688,6 @@ var render = function() {
               { staticClass: "picker-wrapper" },
               [
                 _c("PicturePicker", {
-                  directives: [
-                    {
-                      name: "show",
-                      rawName: "v-show",
-                      value: _vm.editingImage || !_vm.value,
-                      expression: "editingImage || !value"
-                    }
-                  ],
                   ref: "picturePicker",
                   attrs: {
                     "aspect-ratio": _vm.field.aspectRatio,

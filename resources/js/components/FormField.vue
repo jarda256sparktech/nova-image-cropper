@@ -12,7 +12,6 @@
                         @cropFileChanged="setCropFile"
                         ref="picturePicker"
                         v-model="value"
-                        v-show="editingImage || !value"
                     />
                     <p
                         class="my-2 text-danger"
@@ -49,37 +48,56 @@
 
 		data() {
 			return {
+				isNew: false,
+				valueObject: {},
+				originalValueObject: {},
+				editingImage: true,
+				resetModalOpen: false,
+				removeModalOpen: false,
 				deleting: false,
-				editingImage: false,
+
+
 				cropFile: null,
 				file: null,
 				origFile: null,
 				fileName: '',
-				removeModalOpen: false,
-                valueObject: {},
 				uploadErrors: new Errors()
 			}
 		},
 
 		computed: {
-			/**
-			 * Determine if should hit the endpoint for delete
-			 */
-			imageExistsOnServer() {
-				return Boolean(this.field.previewUrl)
+			isNew() {
+				return !Boolean(this.field.previewUrl)
+			}
+		},
+		watch: {
+			valueObject(value) {
+				this.value = JSON.stringify(value);
 			}
 		},
 
-		mounted() {
-			console.log('mounted field',this.field);
+		beforeMount() {
+			console.log('before mounted FormField');
 			this.value = this.field.value || '';
 			this.valueObject = JSON.parse(this.field.value) || {};
+			this.valueObject.modified = false;
+			if (!this.isNew) {
+				let file = new File(this.field.previewUrl);
+				if (typeof FileReader === 'function') {
+					const reader = new FileReader();
+					reader.onload = event => {
+						this.valueObject.binaryImg = event.target.result
+					};
+					reader.readAsDataURL(file)
+				} else {
+					alert('Sorry, FileReader API not supported')
+				}
+				this.originalValueObject = this.valueObject;
+			}
 		},
 
 		methods: {
 			setFile(file) {
-				this.editingImage = true;
-				// console.log('setFile');
 				this.file = file;
 				this.fileName = file.name
 			},
@@ -99,36 +117,11 @@
 				this.valueObject = {};
 			},
 
-			/**
-			 * Confirm removal of the linked file
-			 */
-			confirmRemoval() {
-				// this.editingImage = false
-				this.removeModalOpen = true
-			},
 
-			/**
-			 * Close the upload removal modal
-			 */
-			closeRemoveModal() {
-				this.removeModalOpen = false
-				// this.editingImage = true
-			},
-
-
-
-			async deleteImage(index) {
-				axios.delete('/nova-vendor/nova-image-cropper/delete/');
-				this.images = {};
-				this.value = '';
-			},
-			/**
-			 * Remove the linked file from storage
-			 */
 			async removeFile() {
 				this.closeRemoveModal();
 
-				if (!this.imageExistsOnServer) {
+				if (this.isNew) {
 					this.resetFile();
 					return
 				}
@@ -167,12 +160,8 @@
 			// 	console.log('init field value',this.field.value);
 			// 	this.value = this.field.value || '';
 			// 	this.valueObject = JSON.parse(this.field.value) || {};
-            //
+			//
 			// },
-
-			fill(formData) {
-				formData.append(this.field.attribute, this.value || '');
-			},
 
 			/**
 			 * Update the field's internal value.
@@ -181,10 +170,30 @@
 				this.value = value
 			},
 
-			onUpdateValueObject(valueObject){
-				console.log('onUpdateValueObject',valueObject);
+			onUpdateValueObject(valueObject) {
+				console.log('onUpdateValueObject', valueObject);
 				this.valueObject = valueObject;
-            }
+			},
+			confirmRemoval() {
+				this.removeModalOpen = true
+			},
+			closeRemoveModal() {
+				this.removeModalOpen = false
+			},
+			confirmReset() {
+				this.resetModalOpen = true
+			},
+			closeResetModal() {
+				this.resetModalOpen = false
+			},
+			resetChanges() {
+				this.valueObject = this.originalValueObject;
+				this.file = null;
+				this.cropFile = null;
+				this.fileName = '';
+				this.value = '';
+				this.valueObject = {};
+			},
 		}
 	}
 </script>

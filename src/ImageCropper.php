@@ -18,16 +18,13 @@ class ImageCropper extends Image
 
     public $disk;
 
-    public function aspectRatio($ratio)
-    {
-        return $this->withMeta(['aspectRatio' => $ratio]);
-    }
-
     public function __construct($name, $attribute = null, $disk = 'public', $storageCallback = null)
     {
         parent::__construct($name, $attribute);
 
         $this->disk = $disk;
+
+        $this->withMeta(['aspectRatio' => 1.5]);
 
         $this->thumbnail(function () {
             $parsedValue = json_decode($this->value, true);
