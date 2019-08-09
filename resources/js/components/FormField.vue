@@ -7,7 +7,7 @@
                         :aspect-ratio="field.aspectRatio"
                         @deleteImage="confirmRemoval"
                         @fileChanged="setFile"
-                        @thumbFileChanged="setThumbFile"
+                        @cropFileChanged="setCropFile"
                         ref="picturePicker"
                         v-model="value"
                         v-show="editingImage || !value"
@@ -49,7 +49,7 @@
 			return {
 				deleting: false,
 				editingImage: false,
-				thumbFile: null,
+				cropFile: null,
 				file: null,
 				origFile: null,
 				fileName: '',
@@ -75,6 +75,7 @@
 		},
 
 		mounted() {
+			console.log(this.field);
 			this.value = this.field.previewUrl;
 			this.field.fill = formData => {
 				if (this.file) {
@@ -100,9 +101,9 @@
 				this.file = file;
 				this.fileName = file.name
 			},
-			setThumbFile(file) {
+			setCropFile(file) {
 				// console.log('setThumbFile');
-				this.thumbFile = file
+				this.cropFile = file
 			},
 
 			/*
@@ -110,7 +111,7 @@
              */
 			resetFile(file) {
 				this.file = null;
-				this.thumbFile = null;
+				this.cropFile = null;
 				this.fileName = '';
 				this.value = ''
 			},
@@ -176,7 +177,6 @@
 			 * Update the field's internal value.
 			 */
 			handleChange(value) {
-				// console.log('handleChange');
 				this.value = value
 			}
 		}

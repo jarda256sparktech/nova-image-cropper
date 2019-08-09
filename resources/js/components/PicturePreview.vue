@@ -8,18 +8,13 @@
         <div class="width50">
             <div id="cropped-preview"></div>
         </div>
-<!--        <div class="width50">-->
-<!--            <div class="full-preview-wrapper">-->
-<!--                <img :src="thumbImage">-->
-<!--            </div>-->
-<!--        </div>-->
     </div>
 </template>
 <script>
 
 	export default {
 		name: 'PicturePreview',
-		props: ['image', 'thumbImage'],
+		props: ['image', 'cropImage'],
 
 		data() {
 			return {}

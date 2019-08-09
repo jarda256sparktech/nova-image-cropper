@@ -10,11 +10,11 @@
             type="file"
         >
         <input
-            :id="hashThumb"
-            @change="setThumbImage"
+            :id="hashCrop"
+            @change="setCropImage"
             accept="image/*"
             class="inputfile"
-            name="image-thumb"
+            name="image-crop"
             style="font-size: 1.2em; padding: 10px 0;"
             type="file"
         >
@@ -39,7 +39,7 @@
                 :ratio="ratio"
                 :originalFileType="originalFileType"
                 :originalName="originalName"
-                @setThumbImageSrc="setThumbImage"
+                @setCropImageSrc="setCropImage"
                 ref="cropper"
                 v-show="imgSrc"
             />
@@ -50,7 +50,7 @@
             />
             <PicturePreview
                 :image="imgSrc"
-                :thumbImage="thumbImgSrc"
+                :cropImage="cropImgSrc"
                 ref="preview"
                 v-show="imgSrc"
             />
@@ -76,11 +76,11 @@
 				hash: Math.random()
 					.toString(36)
 					.substring(7),
-				hashThumb: Math.random()
+				hashCrop: Math.random()
 					.toString(36)
 					.substring(7),
 				imgSrc: '',
-				thumbImgSrc: '',
+				cropImgSrc: '',
 				maxWidth: 584,
 				cropImg: '',
 				cropImgW: 0,
@@ -110,7 +110,7 @@
 
 		methods: {
 			updateCropper(image) {
-				// console.log('updateCropper');
+				console.log('updateCropper');
 				this.imgSrc = image;
 
 
@@ -154,8 +154,8 @@
 								this.$emit('setWidth', width);
 								this.$emit('setHeight', height);
 								this.$emit('fileChanged', file);
-								this.$emit('thumbFileChanged', file);
-								this.thumbImgSrc = dataUrl;
+								this.$emit('cropFileChanged', file);
+								this.cropImgSrc = dataUrl;
 							}
 						)
 					};
@@ -166,9 +166,9 @@
 				}
 			},
 
-			setThumbImage(thumbDataUrl) {
+			setCropImage(cropDataUrl) {
 				// console.log('setThumbImage');
-				this.thumbImgSrc = thumbDataUrl;
+				this.cropImgSrc = cropDataUrl;
 			},
 
 			// cropImage() {

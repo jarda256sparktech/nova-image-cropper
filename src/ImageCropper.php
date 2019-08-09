@@ -14,6 +14,9 @@ class ImageCropper extends Image
      */
     public $component = 'nova-image-cropper';
 
+    public $cropFileColumn = 'image_crop';
+    public $cropDefineColumn = 'image_crop_define';
+
     /**
      * Create a new field.
      *
@@ -50,11 +53,6 @@ class ImageCropper extends Image
 
             return 'data:image/' . $filetype . ';base64,' . $encoded_file;
         });
-    }
-
-    public function avatar()
-    {
-        return $this->withMeta(['isAvatar' => true]);
     }
 
     public function aspectRatio($ratio)

@@ -1722,6 +1722,7 @@ __webpack_require__(72);
 	mounted: function mounted() {
 		var _this = this;
 
+		console.log(this.field);
 		this.value = this.field.previewUrl;
 		this.field.fill = function (formData) {
 			if (_this.file) {
@@ -1853,7 +1854,6 @@ __webpack_require__(72);
    * Update the field's internal value.
    */
 		handleChange: function handleChange(value) {
-			// console.log('handleChange');
 			this.value = value;
 		}
 	}
@@ -13079,7 +13079,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 	methods: {
 		updateCropper: function updateCropper(image) {
-			// console.log('updateCropper');
+			console.log('updateCropper');
 			this.imgSrc = image;
 
 			this.cropImg = image;

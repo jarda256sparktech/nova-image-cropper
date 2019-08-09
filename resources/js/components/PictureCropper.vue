@@ -73,7 +73,7 @@
 				this.setWidth();
 				const self = this;
 
-				this.$refs.img.addEventListener('cropmove', this.updateThumb);
+				this.$refs.img.addEventListener('cropmove', this.updateCrop);
 
 				this.cropper = new Cropper(this.$refs.img, {
 					viewMode: 1,
@@ -91,12 +91,12 @@
 				this.cropper.replace(this.image)
 			},
 
-			updateThumb() {
+			updateCrop() {
 				const canvas = this.getCroppedCanvas();
 				if (canvas) {
 					// console.log('updateThumb');
-					const thumbFileSrc = canvas.toDataURL();
-					this.$emit('setThumbImageSrc', thumbFileSrc);
+					const cropFileSrc = canvas.toDataURL();
+					this.$emit('setCropImageSrc', cropFileSrc);
 					canvas.toBlob(blob => {
 						const {type} = blob;
 						const file = new File([blob], this.originalName, {
@@ -104,7 +104,7 @@
 							lastModified: Date.now()
 						});
 						// console.log(file,thumbFileSrc);
-						this.$emit('thumbFileChanged', file);
+						this.$emit('CropFileChanged', file);
 					}, this.originalFileType);
 				}
 			},
@@ -130,7 +130,7 @@
 				this.image = image;
 
 				this.buildCropper();
-				this.$emit('thumbFileChanged', image)
+				this.$emit('cropFileChanged', image)
 			}
 		}
 	}
