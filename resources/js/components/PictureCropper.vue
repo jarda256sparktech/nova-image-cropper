@@ -48,6 +48,7 @@
 
 		watch: {
 			image(image) {
+				console.log('image watch');
 				if (image) {
 					this.buildCropper()
 				}
@@ -67,6 +68,7 @@
 
 		methods: {
 			buildCropper() {
+				console.log('build cropper');
 				if (this.cropper) {
 					this.cropper.destroy();
 				}
@@ -75,6 +77,7 @@
 				const self = this;
 
 				this.$refs.img.addEventListener('cropmove', this.updateCrop);
+				this.$refs.img.addEventListener('ready', this.updateCrop);
 
 				this.cropper = new Cropper(this.$refs.img, {
 					viewMode: 1,
@@ -89,20 +92,18 @@
 					minContainerHeight: self.height,
 					preview: '#cropped-preview'
 				});
-				this.cropper.replace(this.image)
+				this.cropper.replace(this.image);
+
 			},
 
 			updateCrop() {
+				// console.log('updateCrop');
 				const canvas = this.getCroppedCanvas();
 				if (canvas) {
-					// console.log('updateThumb');
 					const cropFileSrc = canvas.toDataURL();
 					const cropBoxData = this.getCropBoxData();
-					console.log('updateCrop');
-					this.$emit('setCropImageSrc', cropFileSrc);
 					this.$emit("update-value-object", {...this.parsedValueObject,
-                        modified: true,cropBinary:cropFileSrc,cropBoxData:cropBoxData});
-
+                        modified: true,binaryCrop:cropFileSrc,cropBoxData:cropBoxData});
 				}
 			},
 

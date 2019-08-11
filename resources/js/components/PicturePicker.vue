@@ -67,7 +67,6 @@
 				imgSrc: '',
 				cropImgSrc: '',
 				maxWidth: 584,
-				cropImg: '',
 				cropImgW: 0,
 				cropImgH: 0,
 				originalName: 'uploaded_file.jpg',
@@ -91,12 +90,12 @@
 			passUpdateValueObject(parsedValueObject) {
 				this.$emit('update-value-object', parsedValueObject);
 			},
-			updateCropper(image) {
-				// console.log('updateCropper');
-				// if (this.$refs.cropper) {
-				// 	this.$refs.cropper.replace(image)
-				// }
-			},
+			// updateCropper(image) {
+			// 	// console.log('updateCropper');
+			// 	if (this.$refs.cropper) {
+			// 		this.$refs.cropper.replace(image)
+			// 	}
+			// },
 
 			pickImage(e) {
 				let file;
@@ -118,13 +117,14 @@
 							event.target.result,
 							file.type,
 							({dataUrl}) => {
+								// this.updateCropper(dataUrl);
 								if (dataUrl) {
-									this.parsedValueObject ={
+									console.log('pickImage');
+									this.$emit('update-value-object', {
 										...this.parsedValueObject, modified: true, binaryImg:
-										dataUrl, cropImg: null, loaded: true, cropBinary: null, cropBoxData: null
-									};
+										dataUrl, loaded: true, binaryCrop: null, cropBoxData: null
+									})
 								}
-								this.updateCropper(dataUrl);
 							}
 						)
 					};

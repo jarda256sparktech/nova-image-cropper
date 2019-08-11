@@ -24,11 +24,11 @@
                                 @confirm="removeFile"
                                 v-if="removeModalOpen"
                             />
-<!--                            <confirm-upload-removal-modal-->
-<!--                                @close="closeResetModal"-->
-<!--                                @confirm="resetChanges"-->
-<!--                                v-if="resetModalOpen"-->
-<!--                            />-->
+                            <!--                            <confirm-upload-removal-modal-->
+                            <!--                                @close="closeResetModal"-->
+                            <!--                                @confirm="resetChanges"-->
+                            <!--                                v-if="resetModalOpen"-->
+                            <!--                            />-->
                         </transition>
                     </portal>
                 </div>
@@ -57,12 +57,12 @@
 				parsedValueObject: {
 					modified: false,
 					loaded: false,
-                    binaryImg:null,
-                    binaryCrop:null,
-                    cropBoxData:null,
-                    imgSrc: null,
-                    cropSrc: null,
-                },
+					binaryImg: null,
+					binaryCrop: null,
+					cropBoxData: null,
+					imgSrc: null,
+					cropSrc: null,
+				},
 				originalValueObject: {},
 				editingImage: true,
 				resetModalOpen: false,
@@ -91,7 +91,7 @@
 			this.value = this.field.value || '';
 
 			let parsedValueFromJson = JSON.parse(this.field.value);
-			this.parsedValueObject = {...this.parsedValueObject,...parsedValueFromJson};
+			this.parsedValueObject = {...this.parsedValueObject, ...parsedValueFromJson};
 			if (!this.isNew) {
 				// let file = new File(this.field.previewUrl);
 				// if (typeof FileReader === 'function') {
@@ -112,15 +112,15 @@
 		methods: {
 			async removeFile() {
 				this.closeRemoveModal();
-                alert('remove');
+				alert('remove');
 				// if (this.isNew) {
 				// 	this.resetFile();
 				// 	return
 				// }
-                //
+				//
 				// this.deleting = true;
 				// this.uploadErrors = new Errors();
-                //
+				//
 				// const {
 				// 	resourceName,
 				// 	resourceId,
@@ -129,11 +129,11 @@
 				// 	viaRelationship
 				// } = this;
 				// const attribute = this.field.attribute;
-                //
+				//
 				// const uri = this.viaRelationship
 				// 	? `/nova-api/${resourceName}/${resourceId}/${relatedResourceName}/${relatedResourceId}/field/${attribute}?viaRelationship=${viaRelationship}`
 				// 	: `/nova-api/${resourceName}/${resourceId}/field/${attribute}`;
-                //
+				//
 				// try {
 				// 	await Nova.request().delete(uri);
 				// 	this.deleting = false;
@@ -141,7 +141,7 @@
 				// 	this.$emit('file-deleted')
 				// } catch (error) {
 				// 	this.deleting = false;
-                //
+				//
 				// 	if (error.response.status == 422) {
 				// 		this.uploadErrors = new Errors(error.response.data.errors)
 				// 	}
