@@ -5,6 +5,7 @@
                 <div class="picker-wrapper">
                     <PicturePicker
                         :aspect-ratio="field.aspectRatio"
+                        :reset-count="resetCount"
                         :parsed-value-object="parsedValueObject"
                         @update-value-object="onUpdateValueObject"
                         @deleteImage="confirmRemoval"
@@ -24,11 +25,11 @@
                                 @confirm="removeFile"
                                 v-if="removeModalOpen"
                             />
-                            <!--                            <confirm-upload-removal-modal-->
-                            <!--                                @close="closeResetModal"-->
-                            <!--                                @confirm="resetChanges"-->
-                            <!--                                v-if="resetModalOpen"-->
-                            <!--                            />-->
+                            <confirm-upload-reset-modal
+                                @close="closeResetModal"
+                                @confirm="resetChanges"
+                                v-if="resetModalOpen"
+                            />
                         </transition>
                     </portal>
                 </div>
@@ -57,6 +58,7 @@
 				parsedValueObject: {
 					modified: false,
 					loaded: false,
+					isNew: true,
 					binaryImg: null,
 					binaryCrop: null,
 					cropBoxData: null,
@@ -68,88 +70,64 @@
 				resetModalOpen: false,
 				removeModalOpen: false,
 				deleting: false,
+				resetCount: 1,
 				uploadErrors: new Errors()
 			}
 		},
 
-		computed: {
-			isNew() {
-				return !Boolean(this.field.previewUrl)
-			},
-		},
 		watch: {
 			parsedValueObject() {
 				let stringObject = JSON.stringify(this.parsedValueObject);
-				console.log('watch val object');
 				this.value = stringObject;
-
 			}
 		},
 
 		beforeMount() {
-			// console.log('before mounted FormField');
 			this.value = this.field.value || '';
 
 			let parsedValueFromJson = JSON.parse(this.field.value);
 			this.parsedValueObject = {...this.parsedValueObject, ...parsedValueFromJson};
-			if (!this.isNew) {
-				// let file = new File(this.field.previewUrl);
-				// if (typeof FileReader === 'function') {
-				// 	const reader = new FileReader();
-				// 	reader.onload = event => {
-				// 		this.parsedValueObject.binaryImg = event.target.result
-				// 	};
-				// 	reader.readAsDataURL(file)
-				// } else {
-				// 	alert('Sorry, FileReader API not supported')
-				// }
-				//
-				this.parsedValueObject.binaryImg = UrlToBase64(this.field.previewUrl);
+			if (Boolean(this.field.previewUrl)) {
+				this.parsedValueObject.isNew = false;
+				UrlToBase64(this.field.thumbnailUrl, (base64) => {
+					this.parsedValueObject.binaryCrop = base64;
+				});
+				UrlToBase64(this.field.previewUrl, (base64) => {
+					this.parsedValueObject.binaryImg = base64;
+				});
+				this.parsedValueObject.loaded = true;
+
 				this.originalValueObject = this.parsedValueObject;
 			}
 		},
 
 		methods: {
-			async removeFile() {
+			removeFile() {
 				this.closeRemoveModal();
-				alert('remove');
-				// if (this.isNew) {
-				// 	this.resetFile();
-				// 	return
-				// }
-				//
-				// this.deleting = true;
-				// this.uploadErrors = new Errors();
-				//
-				// const {
-				// 	resourceName,
-				// 	resourceId,
-				// 	relatedResourceName,
-				// 	relatedResourceId,
-				// 	viaRelationship
-				// } = this;
-				// const attribute = this.field.attribute;
-				//
-				// const uri = this.viaRelationship
-				// 	? `/nova-api/${resourceName}/${resourceId}/${relatedResourceName}/${relatedResourceId}/field/${attribute}?viaRelationship=${viaRelationship}`
-				// 	: `/nova-api/${resourceName}/${resourceId}/field/${attribute}`;
-				//
-				// try {
-				// 	await Nova.request().delete(uri);
-				// 	this.deleting = false;
-				// 	this.resetFile();
-				// 	this.$emit('file-deleted')
-				// } catch (error) {
-				// 	this.deleting = false;
-				//
-				// 	if (error.response.status == 422) {
-				// 		this.uploadErrors = new Errors(error.response.data.errors)
-				// 	}
-				// }
+				if (!Boolean(this.field.previewUrl)) {
+					this.parsedValueObject = {
+						modified: false,
+						loaded: false,
+						isNew: true,
+						binaryImg: null,
+						binaryCrop: null,
+						cropBoxData: null,
+						imgSrc: null,
+						cropSrc: null,
+					};
+					return;
+				}
+				this.parsedValueObject = {
+					...this.parsedValueObject,
+					binaryImg: null,
+					binaryCrop: null,
+					cropBoxData: null,
+					loaded: false,
+					isNew: true,
+				};
 			},
 
 			onUpdateValueObject(newValueObject) {
-				console.log('onUpdateValueObject');
 				this.parsedValueObject = newValueObject;
 			},
 			confirmRemoval() {
@@ -165,6 +143,8 @@
 				this.resetModalOpen = false
 			},
 			resetChanges() {
+				this.resetCount = this.resetCount + 1;
+				this.closeResetModal();
 				this.parsedValueObject = this.originalValueObject;
 			},
 		}

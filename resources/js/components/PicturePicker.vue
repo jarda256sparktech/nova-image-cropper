@@ -15,16 +15,19 @@
                 class="btn btn-default btn-primary mr-3 mb-2 cursor-pointer"
             >{{__('Delete')}}
             </div>
-            <label
-                :for="hash"
+            <div
+                @click="$emit('resetChanges')"
                 class="btn btn-default btn-primary mr-3 mb-2 cursor-pointer"
-            >{{__('Change Image')}}</label>
+                v-if="parsedValueObject.imgSrc"
+            >{{__('Reset')}}
+            </div>
         </div>
         <br>
         <div class="cropper-wrapper">
             <PictureCropper
                 :image="parsedValueObject.binaryImg"
                 :ratio="ratio"
+                :reset="resetCount"
                 :parsed-value-object="parsedValueObject"
                 @update-value-object="passUpdateValueObject"
                 :originalFileType="originalFileType"
@@ -57,7 +60,7 @@
 
 		components: {PicturePreview, PicturePickerFile, PictureCropper},
 
-		props: ['value', 'parsedValueObject', 'aspectRatio', 'loaded'],
+		props: ['value', 'parsedValueObject', 'aspectRatio', 'loaded','resetCount'],
 
 		data() {
 			return {
@@ -76,7 +79,7 @@
 
 		computed: {
 			ratio() {
-				return this.aspectRatio
+				return this.aspectRatio;
 			},
 
 			wrapperStyle() {
@@ -90,12 +93,6 @@
 			passUpdateValueObject(parsedValueObject) {
 				this.$emit('update-value-object', parsedValueObject);
 			},
-			// updateCropper(image) {
-			// 	// console.log('updateCropper');
-			// 	if (this.$refs.cropper) {
-			// 		this.$refs.cropper.replace(image)
-			// 	}
-			// },
 
 			pickImage(e) {
 				let file;
@@ -108,8 +105,7 @@
 					alert('Please select an image file');
 					return;
 				}
-				// this.originalName = file.name;
-				// this.originalFileType = file.type;
+
 				if (typeof FileReader === 'function') {
 					const reader = new FileReader();
 					reader.onload = event => {
@@ -119,7 +115,6 @@
 							({dataUrl}) => {
 								// this.updateCropper(dataUrl);
 								if (dataUrl) {
-									console.log('pickImage');
 									this.$emit('update-value-object', {
 										...this.parsedValueObject, modified: true, binaryImg:
 										dataUrl, loaded: true, binaryCrop: null, cropBoxData: null

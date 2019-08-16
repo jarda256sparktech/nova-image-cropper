@@ -4,6 +4,7 @@ namespace jarda256sparktech\NovaImageCropper;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Laravel\Nova\Fields\Image;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
@@ -24,16 +25,16 @@ class ImageCropper extends Image
         parent::__construct($name, $attribute, $disk, function (Request $request, $model) {
 
             $decodedJson = json_decode($request->{$this->name});
-            \Log::info('decoded');
             if ($decodedJson->modified) {
-                \Log::info('is modified bI bC cBd', [!empty($decodedJson->binaryImg), !empty($decodedJson->binaryCrop),
-                    !empty($decodedJson->cropBoxData)]);
                 if (!empty($decodedJson->binaryImg) && !empty($decodedJson->binaryCrop)
                     && !empty($decodedJson->cropBoxData)) {
 
-                    \Log::info('go save');
+                    if(!empty($decodedJson->imgSrc) && !empty($decodedJson->cropSrc)){
+                        \Storage::disk('public')->delete([$decodedJson->imgSrc, $decodedJson->cropSrc]);
+                    }
+
                     $base64_image = $decodedJson->binaryImg;
-                    $imageName = $this->uuid().'.png';
+                    $imageName = (string) Str::uuid().'.png';
                     if (preg_match('/^data:image\/(\w+);base64,/', $base64_image)) {
                         $data = substr($base64_image, strpos($base64_image, ',') + 1);
                         $data = base64_decode($data);
@@ -49,10 +50,17 @@ class ImageCropper extends Image
                     $toSave = [
                         'imgSrc' => $imageName, 'cropSrc' => $cropName, 'cropBoxData' => $decodedJson->cropBoxData,
                     ];
-                    $model->update([
-                        'image' => json_encode($toSave),
-                    ]);
 
+                    return[
+                        'image' => json_encode($toSave),
+                    ];
+
+                } else {
+                    \Storage::disk('public')->delete([$decodedJson->imgSrc, $decodedJson->cropSrc]);
+
+                    return[
+                        'image' => null,
+                    ];
                 }
 
             }
@@ -62,18 +70,12 @@ class ImageCropper extends Image
         $this->thumbnail(function () {
             $parsedValue = json_decode($this->value, true);
 
-            return $parsedValue ? Storage::disk($this->disk)->url($parsedValue['imageSrc']) : null;
+            return $parsedValue ? \Storage::disk($this->disk)->url($parsedValue['cropSrc']) : null;
         })->preview(function () {
             $parsedValue = json_decode($this->value, true);
 
-            return $parsedValue ? Storage::disk($this->disk)->url($parsedValue['cropSrc']) : null;
+            return $parsedValue ? \Storage::disk($this->disk)->url($parsedValue['imgSrc']) : null;
         });
-//            ->delete(function () {
-//            if ($this->value) {
-//                Storage::disk($this->disk)->delete($this->value);
-//                return $this->columnsThatShouldBeDeleted();
-//            }
-//        });
     }
 
     protected function fillAttribute(NovaRequest $request, $requestAttribute, $model, $attribute)

@@ -38,7 +38,7 @@ export const resizeImage = (image, type, cb) => {
   newImage.src = image;
 };
 
-export const UrlToBase64 = (url, onSuccess, onError) => {
+export const UrlToBase64 = (url, cb) => {
   var img = new Image();
   var canvas = document.createElement('CANVAS');
   var ctx = canvas.getContext('2d');

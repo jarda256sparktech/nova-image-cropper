@@ -35,7 +35,11 @@
 				type: String,
 				default: ''
 			},
-			parsedValueObject: Object
+			parsedValueObject: Object,
+			reset: {
+				type: Number,
+				default: 1
+			},
 		},
 
 		data() {
@@ -48,27 +52,26 @@
 
 		watch: {
 			image(image) {
-				console.log('image watch');
 				if (image) {
-					this.buildCropper()
+					this.buildCropper();
 				}
+			},
+			reset(value) {
+				this.cropper.setCropBoxData({...this.parsedValueObject.cropBoxData});
 			}
 		},
 
 		mounted() {
-			// console.log('mounted picture cropper',this.parsedValueObject);
-			// window.addEventListener('resize', this.setWidth);
-			this.buildCropper()
+			this.buildCropper();
 		},
 
 		destroyed() {
-			// window.removeEventListener('resize', this.setWidth);
 			this.cropper.destroy()
 		},
 
 		methods: {
 			buildCropper() {
-				console.log('build cropper');
+				// console.log('build cropper');
 				if (this.cropper) {
 					this.cropper.destroy();
 				}
@@ -77,7 +80,7 @@
 				const self = this;
 
 				this.$refs.img.addEventListener('cropmove', this.updateCrop);
-				this.$refs.img.addEventListener('ready', this.updateCrop);
+				this.$refs.img.addEventListener('ready', this.readyCrop);
 
 				this.cropper = new Cropper(this.$refs.img, {
 					viewMode: 1,
@@ -97,15 +100,23 @@
 			},
 
 			updateCrop() {
-				// console.log('updateCrop');
 				const canvas = this.getCroppedCanvas();
 				if (canvas) {
 					const cropFileSrc = canvas.toDataURL();
 					const cropBoxData = this.getCropBoxData();
-					this.$emit("update-value-object", {...this.parsedValueObject,
-                        modified: true,binaryCrop:cropFileSrc,cropBoxData:cropBoxData});
+					this.$emit("update-value-object", {
+						...this.parsedValueObject,
+						modified: true, binaryCrop: cropFileSrc, cropBoxData: cropBoxData
+					});
 				}
 			},
+
+            readyCrop(){
+				this.updateCrop();
+	            if (!this.parsedValueObject.isNew) {
+		            this.cropper.setCropBoxData({...this.parsedValueObject.cropBoxData});
+	            }
+            },
 
 
 			setWidth() {
