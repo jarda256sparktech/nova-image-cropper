@@ -18,8 +18,6 @@ class ImageCropper extends Image
      */
     public $component = 'nova-image-cropper';
 
-    public $disk;
-
     public function __construct($name, $attribute = null, $disk = 'public')
     {
         parent::__construct($name, $attribute, $disk, function (Request $request, $model) {
@@ -30,7 +28,7 @@ class ImageCropper extends Image
                     && !empty($decodedJson->cropBoxData)) {
 
                     if(!empty($decodedJson->imgSrc) && !empty($decodedJson->cropSrc)){
-                        \Storage::disk('public')->delete([$decodedJson->imgSrc, $decodedJson->cropSrc]);
+                        \Storage::disk($this->disk)->delete([$decodedJson->imgSrc, $decodedJson->cropSrc]);
                     }
 
                     $base64_image = $decodedJson->binaryImg;
@@ -38,14 +36,14 @@ class ImageCropper extends Image
                     if (preg_match('/^data:image\/(\w+);base64,/', $base64_image)) {
                         $data = substr($base64_image, strpos($base64_image, ',') + 1);
                         $data = base64_decode($data);
-                        \Storage::disk('public')->put($imageName, $data);
+                        \Storage::disk($this->disk)->put($imageName, $data);
                     }
                     $cropName = '_'.$imageName;
                     $base64_image = $decodedJson->binaryCrop;
                     if (preg_match('/^data:image\/(\w+);base64,/', $base64_image)) {
                         $data = substr($base64_image, strpos($base64_image, ',') + 1);
                         $data = base64_decode($data);
-                        Storage::disk('public')->put($cropName, $data);
+                        Storage::disk($this->disk)->put($cropName, $data);
                     }
                     $toSave = [
                         'imgSrc' => $imageName, 'cropSrc' => $cropName, 'cropBoxData' => $decodedJson->cropBoxData,
@@ -56,7 +54,7 @@ class ImageCropper extends Image
                     ];
 
                 } else {
-                    \Storage::disk('public')->delete([$decodedJson->imgSrc, $decodedJson->cropSrc]);
+                    \Storage::disk($this->disk)->delete([$decodedJson->imgSrc, $decodedJson->cropSrc]);
 
                     return[
                         'image' => null,
